@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS public.institute_leads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  email TEXT,
+  interested_course_id UUID REFERENCES public.institute_courses(id),
+  message TEXT,
+  status TEXT NOT NULL DEFAULT 'new'
+    CHECK (status IN ('new', 'contacted', 'interested', 'not-interested', 'enrolled')),
+  assigned_telecaller_id UUID REFERENCES public.users(id),
+  session_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
