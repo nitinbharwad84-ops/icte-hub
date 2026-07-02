@@ -1,6 +1,7 @@
 'use server';
 
 import { z } from 'zod';
+import { createClient } from '@/lib/supabase/server';
 
 const LeadSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -25,4 +26,19 @@ export async function createLeadAction(data: LeadInput) {
   } catch {
     return { error: 'Something went wrong. Please try again.', success: false };
   }
+}
+
+export async function checkLeadStatus(_prevState: { found: boolean; submitted: boolean }, formData: FormData) {
+  const name = formData.get('name') as string;
+  const phone = formData.get('phone') as string;
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('leads')
+    .select('name, status, interested_college_ids, created_at')
+    .ilike('name', name)
+    .eq('phone', phone);
+
+  if (!data || data.length === 0) return { found: false, submitted: true };
+  return { found: true, leads: data, submitted: true };
 }
