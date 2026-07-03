@@ -20,7 +20,7 @@ const LeadSchema = z.object({
   phone: z.string().regex(/^\d{10}$/, 'Phone must be 10 digits'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   college_ids: z.array(z.string()).optional(),
-  course_id: z.string().optional(),
+  enrolled_institute_course_id: z.string().optional(),
   message: z.string().optional(),
 });
 
@@ -45,7 +45,7 @@ export async function createLeadAction(data: LeadInput) {
     phone: parsed.data.phone,
     email: parsed.data.email || null,
     interested_college_ids: parsed.data.college_ids?.length ? parsed.data.college_ids : [],
-    course_id: parsed.data.course_id || null,
+    enrolled_institute_course_id: parsed.data.enrolled_institute_course_id || null,
     message: parsed.data.message || null,
     source: 'direct',
   });
@@ -55,17 +55,27 @@ export async function createLeadAction(data: LeadInput) {
   return { success: true, message: 'Inquiry submitted successfully!' };
 }
 
+const CheckStatusSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  phone: z.string().regex(/^\d{10,}$/, 'Phone must be at least 10 digits'),
+});
+
 export async function checkLeadStatus(_prevState: { found: boolean; submitted: boolean }, formData: FormData) {
-  const name = formData.get('name') as string;
-  const phone = formData.get('phone') as string;
+  try {
+    const raw = Object.fromEntries(formData.entries());
+    const parsed = CheckStatusSchema.safeParse(raw);
+    if (!parsed.success) return { found: false, submitted: false, error: parsed.error.errors[0].message };
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('leads')
-    .select('name, status, interested_college_ids, created_at')
-    .ilike('name', name)
-    .eq('phone', phone);
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('leads')
+      .select('name, status, interested_college_ids, created_at')
+      .ilike('name', parsed.data.name)
+      .eq('phone', parsed.data.phone);
 
-  if (!data || data.length === 0) return { found: false, submitted: true };
-  return { found: true, leads: data, submitted: true };
+    if (!data || data.length === 0) return { found: false, submitted: true, leads: [] };
+    return { found: true, submitted: true, leads: data };
+  } catch (e) {
+    return { found: false, submitted: false, error: e instanceof Error ? e.message : 'An error occurred' };
+  }
 }

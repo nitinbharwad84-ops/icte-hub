@@ -38,9 +38,13 @@ export default function TelecallerLeadsPage() {
 
   const fetchLeads = useCallback(async () => {
     setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id;
+
     const { data, error } = await supabase
       .from('leads')
       .select('*')
+      .eq('assigned_telecaller_id', userId)
       .order('created_at', { ascending: false });
 
     if (error || !data) { setLoading(false); return; }

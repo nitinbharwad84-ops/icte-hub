@@ -13,6 +13,7 @@ import { formatDate } from '@/lib/utils/formatters';
 type CheckStatusState = {
   found: boolean;
   submitted: boolean;
+  error?: string;
   leads?: Array<{
     name: string;
     status: string;
@@ -21,15 +22,12 @@ type CheckStatusState = {
   }>;
 };
 
-const initialState: CheckStatusState = { found: false, submitted: false };
-
 export default function CheckStatusPage() {
-  const [state, formAction, pending] = useActionState(
-    async (_prevState: typeof initialState, formData: FormData) => {
-      return checkLeadStatus(_prevState, formData);
-    },
-    initialState
-  );
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [state, formAction, pending] = useActionState(checkLeadStatus as any, {
+    found: false,
+    submitted: false,
+  } as CheckStatusState);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-4 py-16">
@@ -65,6 +63,9 @@ export default function CheckStatusPage() {
           </Button>
         </form>
 
+        {state.error && (
+          <p className="text-center text-sm text-red-500 py-2">{state.error}</p>
+        )}
         {state.found && state.leads && (
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <p className="text-sm font-bold uppercase tracking-wider text-slate-400">

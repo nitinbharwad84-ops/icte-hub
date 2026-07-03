@@ -61,9 +61,11 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    await supabase.from('users').update({ must_change_password: false }).eq('id', user.id);
+await supabase.from('users').update({ must_change_password: false }).eq('id', user.id);
 
-    router.push('/');
+    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+    const dashPath = profile?.role ? `/${profile.role}` : '/';
+    router.push(dashPath);
     router.refresh();
   };
 

@@ -1,6 +1,6 @@
 'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
@@ -8,13 +8,27 @@ import { Alert } from '@/components/ui/Alert';
 import { IcteLogo } from '@/components/shared/IcteLogo';
 import { Mail, Lock } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [cooldown, setCooldown] = useState(false);
+
+  useEffect(() => {
+    if (cooldown) {
+      const timer = setTimeout(() => {
+        setCooldown(false);
+        setLoginAttempts(0);
+      }, 30000);
+      return () => clearTimeout(timer);
+    }
+  }, [cooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +37,11 @@ export default function LoginPage() {
 
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      if (newAttempts >= 3) {
+        setCooldown(true);
+      }
       setError('Invalid email or password');
       setLoading(false);
       return;
@@ -61,7 +80,11 @@ export default function LoginPage() {
             <p className="text-sm text-slate-500 mt-1">Sign in to your dashboard</p>
           </div>
 
+          {searchParams.get('reason') === 'deactivated' && (
+            <Alert variant="error" className="mb-4">Your account has been deactivated. Contact your administrator.</Alert>
+          )}
           {error && <Alert variant="error" className="mb-4">{error}</Alert>}
+          {cooldown && <Alert variant="error" className="mb-4">Too many attempts — wait 30 seconds</Alert>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
@@ -82,12 +105,20 @@ export default function LoginPage() {
               icon={<Lock className="w-4 h-4" />}
               required
             />
-            <Button type="submit" variant="primary" className="w-full" size="lg" loading={loading}>
+            <Button type="submit" variant="primary" className="w-full" size="lg" loading={loading} disabled={cooldown}>
               Sign In
             </Button>
           </form>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

@@ -11,9 +11,16 @@ export async function createClient() {
       cookies: {
         getAll() { return cookieStore.getAll(); },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          );
+          cookiesToSet.forEach(({ name, value, options }) => {
+            const cookieOpts = {
+              ...options,
+              httpOnly: true,
+              sameSite: 'lax' as const,
+              secure: process.env.NODE_ENV === 'production',
+              path: '/',
+            };
+            cookieStore.set(name, value, cookieOpts);
+          });
         },
       },
     }

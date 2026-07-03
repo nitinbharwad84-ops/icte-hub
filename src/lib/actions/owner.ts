@@ -128,7 +128,7 @@ export async function resetAdminPasswordAction(userId: string) {
 
   if (error) return { success: false, error: error.message };
 
-  const { error: updateError } = await supabase.from('users').update({ must_change_password: true }).eq('id', userId);
+  const { error: updateError } = await adminClient.from('users').update({ must_change_password: true }).eq('id', userId);
   if (updateError) return { success: false, error: updateError.message };
 
   return { success: true, tempPassword };
@@ -236,6 +236,9 @@ export async function getUserProfileAction(userId: string) {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { success: false, error: 'Unauthorized', data: null };
+
+  const { data: caller } = await supabase.from('users').select('role').eq('id', user.id).single();
+  if (!caller || caller.role !== 'owner') return { success: false, error: 'Unauthorized', data: null };
 
   const { data: profile } = await supabase
     .from('users')
