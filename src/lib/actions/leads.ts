@@ -28,6 +28,37 @@ export async function createLeadAction(data: LeadInput) {
   }
 }
 
+export async function updateLeadStatusAction(leadId: string, status: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('leads')
+    .update({ status })
+    .eq('id', leadId);
+  if (error) throw new Error(error.message);
+  return { success: true };
+}
+
+export async function assignTelecallerAction(leadId: string, telecallerId: string | null) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('leads')
+    .update({ assigned_telecaller_id: telecallerId })
+    .eq('id', leadId);
+  if (error) throw new Error(error.message);
+  return { success: true };
+}
+
+export async function getCallHistoryAction(leadId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('call_logs')
+    .select('*')
+    .eq('lead_id', leadId)
+    .order('call_date', { ascending: false });
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function checkLeadStatus(_prevState: { found: boolean; submitted: boolean }, formData: FormData) {
   const name = formData.get('name') as string;
   const phone = formData.get('phone') as string;
