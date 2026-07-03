@@ -366,3 +366,7 @@ UPDATE public.users SET must_change_password = false WHERE email = 'admin@exampl
 | `015_colleges_extended.sql` | Extended college fields (city, state, type, etc.) |
 | `015_page_visits_lead_sessions.sql` | Page visit and session tracking tables |
 | `016_partner_inquiries_extend.sql` | Extended partner inquiry fields |
+
+---
+
+> For a deep dive into the system architecture, business logic, database triggers, security model, and data flows, see [COMPREHENSIVE_GUIDE.md](./COMPREHENSIVE_GUIDE.md).

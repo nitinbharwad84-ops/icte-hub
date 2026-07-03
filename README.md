@@ -130,7 +130,7 @@ src/
 └── styles/globals.css     # Tailwind + custom animations
 supabase/migrations/       # 17 SQL migration files (001 → 016)
 supabase/seed/             # 10 SQL seed files (owner creation + dummy data + cleanup)
-docs/                      # Design docs, setup guide
+docs/                      # Design docs, comprehensive guide, setup guide
 ```
 
 ---
@@ -163,6 +163,8 @@ npm run dev
 ```
 
 > For detailed instructions, see [docs/SETUP_GUIDE.md](./docs/SETUP_GUIDE.md).
+
+For in-depth architecture, business logic, database design, and security details, see [docs/COMPREHENSIVE_GUIDE.md](./docs/COMPREHENSIVE_GUIDE.md).
 
 ---
 
