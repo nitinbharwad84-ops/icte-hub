@@ -66,7 +66,7 @@ export default function InstituteCoursesPage() {
     setError('');
     const { data, error: fetchError } = await supabase
       .from('institute_courses')
-      .select('*')
+      .select('id, course_name, institute_id, duration, fee, mode, description, status, created_at')
       .order('created_at', { ascending: false });
     if (fetchError) { setError(fetchError.message); setLoading(false); return; }
 

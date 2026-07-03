@@ -37,7 +37,7 @@ export default function PartnerInquiriesPage() {
 
     let query = supabase
       .from('partner_inquiries')
-      .select('*')
+      .select('id, college_name, contact_person, phone, email, city, message, status, created_at')
       .order('created_at', { ascending: false });
 
     if (statusFilter) query = query.eq('status', statusFilter);

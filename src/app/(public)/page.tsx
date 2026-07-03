@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server';
 import { HomeContent } from './home-content';
 
 export default async function HomePage() {
-  let colleges: any[] = [];
-  let courses: any[] = [];
+  let colleges: Array<{ id: string; name: string; mode: string; location: string; courses_offered: string[]; logo_url?: string }> = [];
+  let courses: Array<{ id: string; name: string; duration: string; fees: number }> = [];
   let collegeCount = 0;
   let courseCount = 0;
 
@@ -17,8 +17,8 @@ export default async function HomePage() {
     courses = coursesRes.data ?? [];
     collegeCount = collegesRes.count ?? colleges.length;
     courseCount = coursesRes.count ?? courses.length;
-  } catch {
-    // Supabase not configured — render with empty data
+  } catch (err) {
+    console.error('Failed to fetch data:', err);
   }
 
   return (

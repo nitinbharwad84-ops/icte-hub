@@ -68,7 +68,7 @@ export function CollegesContent({ colleges, total, online, offline }: { colleges
                 className="w-full pl-12 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 font-semibold focus:border-brand-blue/50 focus:ring-2 focus:ring-brand-blue/15 outline-none transition-all"
               />
               {search && (
-                <button onClick={clearFilters} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <button onClick={clearFilters} aria-label="Clear filters" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                   <X className="w-4 h-4" />
                 </button>
               )}

@@ -138,8 +138,8 @@ export default function AdminCollegesPage() {
       setSaving(false);
       setModalOpen(false);
       fetchColleges();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save college');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save college');
       setSaving(false);
     }
   };

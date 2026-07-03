@@ -91,7 +91,12 @@ export default function TelecallerLeadsPage() {
     setSubmittingCall(leadId);
     const outcome = formData.get('outcome') as string;
     const notes = formData.get('notes') as string;
-    await supabase.from('call_logs').insert({ lead_id: leadId, outcome, notes });
+    const { error: callError } = await supabase.from('call_logs').insert({ lead_id: leadId, outcome, notes });
+    if (callError) {
+      console.error('Failed to log call:', callError);
+      setSubmittingCall(null);
+      return;
+    }
     const { data } = await supabase
       .from('call_logs')
       .select('*')

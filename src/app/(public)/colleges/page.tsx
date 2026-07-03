@@ -11,7 +11,7 @@ export default async function CollegesPage({
 
   const search = params.search || '';
   const mode = params.mode || '';
-  let query = supabase.from('colleges').select('*');
+  let query = supabase.from('colleges').select('id, name, mode, location, logo_url, courses_offered');
   if (search) query = query.ilike('name', `%${search}%`);
   if (mode && mode !== 'All') query = query.eq('mode', mode);
   query = query.order('name');

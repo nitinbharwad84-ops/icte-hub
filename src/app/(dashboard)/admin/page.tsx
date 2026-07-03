@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/Button';
@@ -29,6 +29,13 @@ interface Telecaller {
   name: string;
 }
 
+interface CallLog {
+  id: string;
+  outcome: string;
+  notes: string | null;
+  call_date: string;
+}
+
 export default function AdminLeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [telecallers, setTelecallers] = useState<Telecaller[]>([]);
@@ -38,7 +45,7 @@ export default function AdminLeadsPage() {
   const [telecallerFilter, setTelecallerFilter] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
-  const [callHistory, setCallHistory] = useState<Record<string, unknown>[]>([]);
+  const [callHistory, setCallHistory] = useState<CallLog[]>([]);
   const [callHistoryLoading, setCallHistoryLoading] = useState(false);
   const supabase = createClient();
 
@@ -201,8 +208,8 @@ export default function AdminLeadsPage() {
               </thead>
               <tbody>
                 {filteredLeads.map((lead) => (
-                  <>
-                    <tr key={lead.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <React.Fragment key={lead.id}>
+                    <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                       <td className="p-4 font-semibold text-slate-800">{lead.name}</td>
                       <td className="p-4">
                         <p className="text-slate-600">{lead.phone}</p>
@@ -245,6 +252,7 @@ export default function AdminLeadsPage() {
                           </select>
                           <button
                             onClick={() => handleViewCallHistory(lead.id)}
+                            aria-label="View call history"
                             className="text-slate-400 hover:text-indigo-500 transition-colors"
                             title="Call History"
                           >
@@ -263,7 +271,7 @@ export default function AdminLeadsPage() {
                             <p className="text-xs text-slate-400">No calls recorded</p>
                           ) : (
                             <div className="space-y-2">
-                              {callHistory.map((call: any) => (
+                              {callHistory.map((call: CallLog) => (
                                 <div key={call.id} className="flex items-start gap-3 text-xs bg-white rounded-lg p-3 border border-slate-100">
                                   <span className="font-bold uppercase text-slate-500">{call.outcome.replace(/-/g, ' ')}</span>
                                   <span className="text-slate-400">-</span>
@@ -276,7 +284,7 @@ export default function AdminLeadsPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

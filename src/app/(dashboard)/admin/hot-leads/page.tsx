@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Badge } from '@/components/ui/Badge';
 import { Spinner } from '@/components/ui/Spinner';
@@ -194,9 +194,8 @@ export default function HotLeadsPage() {
               </thead>
               <tbody>
                 {filteredLeads.map((lead) => (
-                  <>
+                  <React.Fragment key={lead.id}>
                     <tr
-                      key={lead.id}
                       className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
                       onClick={() => handleExpand(lead.id)}
                     >
@@ -251,7 +250,7 @@ export default function HotLeadsPage() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>

@@ -98,8 +98,8 @@ export default function ProfilePage() {
       }
       setProfilePicFile(null);
       setSuccess('Profile updated successfully');
-    } catch (err: any) {
-      setError(err.message || 'Failed to save profile');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save profile');
     }
     setSaving(false);
   };
@@ -164,7 +164,7 @@ export default function ProfilePage() {
     );
   }
 
-  const roleColor = role === 'owner' ? 'purple' : role === 'admin' ? 'indigo' : 'blue';
+  const roleColor = role === 'owner' ? 'purple' as const : role === 'admin' ? 'indigo' as const : 'blue' as const;
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
@@ -200,7 +200,7 @@ export default function ProfilePage() {
             <h2 className="text-lg font-extrabold text-slate-900">{name}</h2>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-sm text-slate-500">{email}</span>
-              <Badge color={roleColor as any}>{role}</Badge>
+              <Badge color={roleColor}>{role}</Badge>
             </div>
           </div>
         </div>

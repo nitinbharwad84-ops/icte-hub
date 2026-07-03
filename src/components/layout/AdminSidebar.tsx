@@ -76,7 +76,7 @@ export function AdminSidebar({ user, onClose }: AdminSidebarProps) {
           <Link href="/profile" className="flex-1 text-[10px] font-bold uppercase tracking-wider text-center text-slate-500 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-lg py-2 transition-all">
             Profile
           </Link>
-          <button onClick={handleLogout} className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg px-3 py-2 transition-all">
+          <button onClick={handleLogout} aria-label="Logout" className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg px-3 py-2 transition-all">
             <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>

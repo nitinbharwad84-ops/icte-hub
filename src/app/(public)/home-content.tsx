@@ -16,6 +16,7 @@ import { IcteLogo } from '@/components/shared/IcteLogo';
 import { CATEGORIES, NAV_ITEMS } from '@/lib/utils/constants';
 import { getSessionId, getSource } from '@/lib/utils/session';
 import { Search, Star, GraduationCap, CheckCircle, MapPin, ArrowRight } from 'lucide-react';
+import { createLeadAction } from '@/lib/actions/leads';
 
 interface College {
   id: string;
@@ -52,6 +53,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
   const [formPhone, setFormPhone] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [selectedCollegeForm, setSelectedCollegeForm] = useState<string[]>([]);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const heroRef = useRef<HTMLElement>(null);
   const router = useRouter();
@@ -91,6 +93,20 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
     if (searchQuery) params.set('search', searchQuery);
     if (modeFilter !== 'All') params.set('mode', modeFilter);
     router.push(`/colleges?${params.toString()}`);
+  };
+
+  const handleSubmit = async () => {
+    const result = await createLeadAction({
+      name: formName,
+      phone: formPhone,
+      email: formEmail || undefined,
+      college_ids: selectedCollegeForm.length > 0 ? selectedCollegeForm : undefined,
+    });
+    if (result.success) {
+      setFormName(''); setFormPhone(''); setFormEmail(''); setSelectedCollegeForm([]);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 5000);
+    }
   };
 
   const navLinks = NAV_ITEMS;
@@ -396,14 +412,12 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
                     </div>
                   </div>
                 )}
-                <Button className="w-full" onClick={() => {
-                  getSessionId();
-                  getSource();
-                  setFormName('');
-                  setFormPhone('');
-                  setFormEmail('');
-                  setSelectedCollegeForm([]);
-                }}>
+                {showSuccess && (
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-semibold px-4 py-3 rounded-xl">
+                    Inquiry submitted successfully! We'll contact you shortly.
+                  </div>
+                )}
+                <Button className="w-full" onClick={handleSubmit}>
                   Submit Inquiry
                 </Button>
               </div>

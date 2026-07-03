@@ -213,7 +213,7 @@ export default function OwnerAdminsPage() {
                             </Button>
                           </div>
                         ) : (
-                          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(admin.id)}>
+                          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(admin.id)} aria-label="Delete admin">
                             <Trash2 className="w-3.5 h-3.5 text-red-400" />
                           </Button>
                         )}

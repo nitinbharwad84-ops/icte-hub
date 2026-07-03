@@ -30,7 +30,7 @@ export function AdminLayoutClient({ user, children }: AdminLayoutClientProps) {
 
       {/* Mobile header */}
       <div className="sticky top-0 z-30 md:hidden bg-white border-b border-slate-200 h-16 flex items-center px-4">
-        <button onClick={() => setSidebarOpen(true)} className="text-slate-600 p-2">
+        <button onClick={() => setSidebarOpen(true)} aria-label="Open sidebar" className="text-slate-600 p-2">
           <Menu className="w-6 h-6" />
         </button>
         <span className="ml-3 text-xs font-extrabold uppercase tracking-widest text-indigo-500">Admin</span>
