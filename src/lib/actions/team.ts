@@ -87,7 +87,7 @@ export async function getTelecallersAction() {
     is_active: publicUsersMap.get(au.id)?.is_active ?? true,
     leads_count: countMap.get(au.id) || 0,
     created_at: au.created_at,
-    last_sign_in_at: au.last_sign_in_at,
+    last_sign_in_at: au.last_sign_in_at ?? null,
   }));
 
   return { success: true, data: telecallers };

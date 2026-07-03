@@ -40,7 +40,7 @@ export default function CommissionsPage() {
     setLoading(true);
     setError('');
 
-    const { data: telecallersResult, error: telecallersError } = await supabase
+    const { data: telecallersData } = await supabase
       .from('users')
       .select('id, name');
 
@@ -79,7 +79,7 @@ export default function CommissionsPage() {
       });
 
     setCommissions(enriched);
-    if (telecallersResult.data) setTelecallers(telecallersResult.data);
+    setTelecallers(telecallersData ?? []);
     setLoading(false);
   }, [statusFilter, telecallerFilter, supabase]);
 

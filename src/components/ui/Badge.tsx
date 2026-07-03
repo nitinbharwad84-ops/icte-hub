@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils/cn';
 
 interface BadgeProps {
   variant?: 'status' | 'mode' | 'default';
-  color?: 'blue' | 'indigo' | 'purple' | 'slate' | 'emerald' | 'teal' | 'cyan' | 'orange';
+  color?: 'blue' | 'indigo' | 'purple' | 'slate' | 'emerald' | 'teal' | 'cyan' | 'orange' | 'amber' | 'red';
   children: React.ReactNode;
   className?: string;
 }
@@ -16,6 +16,8 @@ const colorMap: Record<string, string> = {
   teal: 'text-teal-700 bg-teal-50 border-teal-200',
   cyan: 'text-cyan-700 bg-cyan-50 border-cyan-200',
   orange: 'text-orange-700 bg-orange-50 border-orange-200',
+  amber: 'text-amber-700 bg-amber-50 border-amber-200',
+  red: 'text-red-700 bg-red-50 border-red-200',
 };
 
 export function Badge({ color = 'slate', children, className }: BadgeProps) {
