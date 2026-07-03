@@ -1,7 +1,16 @@
 'use server';
 
 import { z } from 'zod';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+const leadRatelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(50, '15 m'),
+  analytics: true,
+});
 
 const LeadSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -15,6 +24,10 @@ const LeadSchema = z.object({
 type LeadInput = z.infer<typeof LeadSchema>;
 
 export async function createLeadAction(data: LeadInput) {
+  const ip = (await headers()).get('x-forwarded-for') ?? 'unknown';
+  const { success } = await leadRatelimit.limit(ip);
+  if (!success) return { error: 'Too many attempts. Try again later.', success: false };
+
   const parsed = LeadSchema.safeParse(data);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors, success: false };

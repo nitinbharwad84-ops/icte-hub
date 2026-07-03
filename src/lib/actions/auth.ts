@@ -1,9 +1,21 @@
 'use server';
 
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+const authRatelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(20, '15 m'),
+  analytics: true,
+});
 
 export async function createUserAction(formData: FormData) {
+  const ip = (await headers()).get('x-forwarded-for') ?? 'unknown';
+  const { success } = await authRatelimit.limit(ip);
+  if (!success) return { success: false, error: 'Too many attempts. Try again later.' };
   const supabase = await createClient();
   
   // Check caller is owner or admin
