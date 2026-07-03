@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Alert } from '@/components/ui/Alert';
 import { Spinner } from '@/components/ui/Spinner';
-import { User, Mail, Phone, Lock, KeyRound, Save } from 'lucide-react';
+import { User, Mail, Phone, Lock, KeyRound, Save, Upload } from 'lucide-react';
+import { compressProfile } from '@/lib/utils/image-compression';
 
 export default function ProfilePage() {
   const supabase = createClient();
@@ -22,6 +23,10 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
 
+  const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+  const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,7 +38,7 @@ export default function ProfilePage() {
 
       const { data: profile } = await supabase
         .from('users')
-        .select('name, email, phone, role')
+        .select('name, email, phone, role, profile_picture_url')
         .eq('id', user.id)
         .single();
 
@@ -42,6 +47,8 @@ export default function ProfilePage() {
         setEmail(profile.email || '');
         setPhone(profile.phone || '');
         setRole(profile.role || '');
+        setProfilePicUrl(profile.profile_picture_url || null);
+        setProfilePicPreview(profile.profile_picture_url || null);
       }
       setLoading(false);
     }
@@ -61,15 +68,38 @@ export default function ProfilePage() {
       return;
     }
 
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ name, phone })
-      .eq('id', user.id);
+    try {
+      let newProfilePicUrl: string | null = null;
 
-    if (updateError) {
-      setError(updateError.message);
-    } else {
+      if (profilePicFile) {
+        const compressed = await compressProfile(profilePicFile);
+        const filePath = `${user.id}.webp`;
+        const { error: uploadError } = await supabase.storage
+          .from('profile_pictures')
+          .upload(filePath, compressed, { contentType: 'image/webp', upsert: true });
+        if (uploadError) throw new Error(uploadError.message);
+        const { data: urlData } = supabase.storage.from('profile_pictures').getPublicUrl(filePath);
+        newProfilePicUrl = urlData.publicUrl;
+      }
+
+      const updateData: Record<string, unknown> = { name, phone };
+      if (newProfilePicUrl) updateData.profile_picture_url = newProfilePicUrl;
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', user.id);
+
+      if (updateError) throw new Error(updateError.message);
+
+      if (newProfilePicUrl) {
+        setProfilePicUrl(newProfilePicUrl);
+        setProfilePicPreview(newProfilePicUrl);
+      }
+      setProfilePicFile(null);
       setSuccess('Profile updated successfully');
+    } catch (err: any) {
+      setError(err.message || 'Failed to save profile');
     }
     setSaving(false);
   };
@@ -149,8 +179,22 @@ export default function ProfilePage() {
       {/* Profile Info Card */}
       <Card glass className="!p-6 !rounded-2xl">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-2xl font-bold">
-            {name.charAt(0).toUpperCase()}
+          <div className="relative group">
+            {profilePicPreview ? (
+              <img src={profilePicPreview} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-2xl font-bold">
+                {name.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <label className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+              <Upload className="w-5 h-5 text-white" />
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setProfilePicFile(file);
+                if (file) setProfilePicPreview(URL.createObjectURL(file));
+              }} />
+            </label>
           </div>
           <div>
             <h2 className="text-lg font-extrabold text-slate-900">{name}</h2>

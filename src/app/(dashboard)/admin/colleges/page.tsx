@@ -80,7 +80,19 @@ export default function AdminCollegesPage() {
       description: college.description || '',
       status: college.status,
     });
+    setLogoFile(null);
+    setLogoPreview(college.logo_url || null);
     setModalOpen(true);
+  };
+
+  const handleSelectLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setLogoFile(file);
+    if (file) {
+      setLogoPreview(URL.createObjectURL(file));
+    } else {
+      setLogoPreview(null);
+    }
   };
 
   const handleSave = async () => {
@@ -88,28 +100,48 @@ export default function AdminCollegesPage() {
     setSaving(true);
     setError('');
 
-    const payload = {
-      name: form.name,
-      city: form.city || null,
-      state: form.state || null,
-      type: form.type || null,
-      established_year: form.established_year ? parseInt(form.established_year, 10) : null,
-      website: form.website || null,
-      description: form.description || null,
-      status: form.status,
-    };
+    try {
+      const collegeId = editingId || crypto.randomUUID();
+      let logoUrl: string | null = null;
 
-    if (editingId) {
-      const { error: updateError } = await supabase.from('colleges').update(payload).eq('id', editingId);
-      if (updateError) { setError(updateError.message); setSaving(false); return; }
-    } else {
-      const { error: insertError } = await supabase.from('colleges').insert(payload);
-      if (insertError) { setError(insertError.message); setSaving(false); return; }
+      if (logoFile) {
+        const compressed = await compressLogo(logoFile);
+        const filePath = `${collegeId}.webp`;
+        const { error: uploadError } = await supabase.storage
+          .from('college_logos')
+          .upload(filePath, compressed, { contentType: 'image/webp', upsert: true });
+        if (uploadError) throw new Error(uploadError.message);
+        const { data: urlData } = supabase.storage.from('college_logos').getPublicUrl(filePath);
+        logoUrl = urlData.publicUrl;
+      }
+
+      const payload: Record<string, unknown> = {
+        name: form.name,
+        city: form.city || null,
+        state: form.state || null,
+        type: form.type || null,
+        established_year: form.established_year ? parseInt(form.established_year, 10) : null,
+        website: form.website || null,
+        description: form.description || null,
+        status: form.status,
+      };
+      if (logoUrl) payload.logo_url = logoUrl;
+
+      if (editingId) {
+        const { error: updateError } = await supabase.from('colleges').update(payload).eq('id', editingId);
+        if (updateError) throw new Error(updateError.message);
+      } else {
+        const { error: insertError } = await supabase.from('colleges').insert({ id: collegeId, ...payload });
+        if (insertError) throw new Error(insertError.message);
+      }
+
+      setSaving(false);
+      setModalOpen(false);
+      fetchColleges();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save college');
+      setSaving(false);
     }
-
-    setSaving(false);
-    setModalOpen(false);
-    fetchColleges();
   };
 
   const handleDelete = async (id: string) => {
@@ -161,6 +193,7 @@ export default function AdminCollegesPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50/50">
+                  <th className="text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 p-4">Logo</th>
                   <th className="text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 p-4">Name</th>
                   <th className="text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 p-4">City</th>
                   <th className="text-left text-[10px] font-extrabold uppercase tracking-widest text-slate-400 p-4">Type</th>
@@ -173,6 +206,13 @@ export default function AdminCollegesPage() {
               <tbody>
                 {filteredColleges.map((college) => (
                   <tr key={college.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="p-4">
+                      {college.logo_url ? (
+                        <img src={college.logo_url} alt={college.name} className="w-8 h-8 rounded-lg object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-xs">—</div>
+                      )}
+                    </td>
                     <td className="p-4 font-semibold text-slate-800">{college.name}</td>
                     <td className="p-4 text-slate-600">{college.city || '—'}</td>
                     <td className="p-4">
@@ -217,6 +257,19 @@ export default function AdminCollegesPage() {
           <h2 className="text-lg font-extrabold text-slate-900 mb-6">{editingId ? 'Edit College' : 'Add College'}</h2>
           <div className="space-y-4">
             <Input label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="College name" />
+            <div>
+              <label className="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">College Logo</label>
+              <div className="flex items-center gap-3">
+                {logoPreview && (
+                  <img src={logoPreview} alt="Logo preview" className="w-12 h-12 rounded-xl object-cover border border-slate-200" />
+                )}
+                <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm font-semibold text-slate-600 cursor-pointer hover:border-brand-blue/50 hover:text-brand-blue transition-all">
+                  <Upload className="w-4 h-4" />
+                  {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                  <input type="file" accept="image/*" onChange={handleSelectLogo} className="hidden" />
+                </label>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <Input label="City" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="City" />
               <Input label="State" value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} placeholder="State" />
