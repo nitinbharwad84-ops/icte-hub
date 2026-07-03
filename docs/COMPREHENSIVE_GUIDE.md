@@ -788,7 +788,18 @@ RootLayout
     └── TelecallerPage (leads table + call logging)
 ```
 
-### UI Component Library (10 Primitives)
+### Utility Functions
+
+| File | Purpose |
+|------|---------|
+| `utils/cn.ts` | Tailwind class merging (`cn()`) |
+| `utils/constants.ts` | Shared constants: nav items, status labels, categories, call outcomes |
+| `utils/csv.ts` | `downloadCsv(headers, rows, filename)` — shared CSV export utility |
+| `utils/formatters.ts` | `formatDate()`, `formatCurrency()`, `formatPhone()` |
+| `utils/session.ts` | `getSessionId()` — localStorage session ID for behavioral tracking |
+| `utils/image-compression.ts` | `compressLogo()` (400px WebP 90%), `compressProfile()` (200px WebP 65%) |
+
+### UI Component Library (9 Primitives)
 
 | Component | Props | Purpose |
 |-----------|-------|---------|
@@ -798,7 +809,6 @@ RootLayout
 | **Badge** | variant, color | Status/mode labels |
 | **Modal** | open, onClose | Overlay dialogs |
 | **Select** | label, error, options | Dropdown selects |
-| **Table** | columns, data | Data tables |
 | **Skeleton** | className | Loading placeholders |
 | **Spinner** | size | Loading indicator |
 | **Alert** | variant | Notifications & errors |

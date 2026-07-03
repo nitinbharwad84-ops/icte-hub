@@ -84,7 +84,9 @@
 
 - **Authentication** — Email/password, role-based routing (admin/owner/telecaller)
 - **Force Password Change** — First-login password enforcement
-- **Profile** — Edit name, change password
+- **Profile** — Edit name, change password, upload profile picture with WebP compression
+- **Image Compression** — Client-side WebP conversion for logos (400px, 90%) and avatars (200px, 65%)
+- **CSV Export** — Shared utility for downloading leads, inquiries, and reports
 - **Behavioral Tracking** — Anonymous visitor tracking, engagement scoring
 - **Audit Logging** — All mutations logged via database triggers
 - **Rate Limiting** — Login (20/15min), lead creation (50/15min) via Upstash
@@ -122,10 +124,9 @@ src/
 │   ├── shared/            # StatusBadge, CollegeCard, InquiryModal
 │   └── ui/                # 10 primitives: Button, Card, Modal, etc.
 ├── lib/
-│   ├── actions/           # Server Actions (leads, auth, calls, export, team, owner)
-│   ├── hooks/             # useTracking custom hook
+│   ├── actions/           # Server Actions (leads, auth, team, owner)
 │   ├── supabase/          # client.ts, server.ts, admin.ts
-│   └── utils/             # cn, constants, formatters, session, image-compression
+│   └── utils/             # cn, constants, csv, formatters, session, image-compression
 ├── middleware.ts           # Auth: role routing + forced password change
 └── styles/globals.css     # Tailwind + custom animations
 supabase/migrations/       # 17 SQL migration files (001 → 016)
