@@ -34,16 +34,16 @@ BEGIN
   -- Page visits (requires page_visits table if it exists)
   -- Check if the table exists first
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'page_visits') THEN
-    INSERT INTO public.page_visits (session_id, page_path, page_title, visited_at) VALUES
-      ('session-test-001', '/', 'Home', now() - interval '1 day'),
-      ('session-test-001', '/colleges', 'Colleges', now() - interval '23 hours'),
-      ('session-test-001', '/colleges', 'Colleges', now() - interval '2 hours'),
-      ('session-test-002', '/', 'Home', now() - interval '2 days'),
-      ('session-test-002', '/colleges', 'Colleges', now() - interval '2 days'),
-      ('session-test-002', '/check-status', 'Check Status', now() - interval '2 days'),
-      ('session-test-003', '/', 'Home', now() - interval '5 days'),
-      ('session-test-004', '/', 'Home', now() - interval '15 days'),
-      ('session-test-004', '/colleges', 'Colleges', now() - interval '15 days');
+    INSERT INTO public.page_visits (session_id, page_url, page_title, created_at) VALUES
+      ('session-test-001', '/', 'Home', (now() - interval '1 day')),
+      ('session-test-001', '/colleges', 'Colleges', (now() - interval '23 hours')),
+      ('session-test-001', '/colleges', 'Colleges', (now() - interval '2 hours')),
+      ('session-test-002', '/', 'Home', (now() - interval '2 days')),
+      ('session-test-002', '/colleges', 'Colleges', (now() - interval '2 days')),
+      ('session-test-002', '/check-status', 'Check Status', (now() - interval '2 days')),
+      ('session-test-003', '/', 'Home', (now() - interval '5 days')),
+      ('session-test-004', '/', 'Home', (now() - interval '15 days')),
+      ('session-test-004', '/colleges', 'Colleges', (now() - interval '15 days'));
   END IF;
 
   RAISE NOTICE 'Visitor tracking data seeded.';
