@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/lib/utils/formatters';
 import { INSTITUTE_LEAD_STATUSES } from '@/lib/utils/constants';
+import { downloadCsv } from '@/lib/utils/csv';
 import { Download, Search } from 'lucide-react';
 
 interface InstituteLead {
@@ -65,11 +66,7 @@ export default function InstituteLeadsPage() {
       l.college_name, l.contact_person || '', l.email || '', l.phone || '', l.city || '',
       l.status, l.created_at,
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'institute-leads.csv'; a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(headers, rows, 'institute-leads.csv');
   };
 
   const filteredLeads = leads.filter(l =>

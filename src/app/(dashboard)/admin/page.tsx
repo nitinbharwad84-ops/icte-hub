@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate, formatPhone } from '@/lib/utils/formatters';
 import { LEAD_STATUSES } from '@/lib/utils/constants';
+import { downloadCsv } from '@/lib/utils/csv';
 import { Search, Download, Phone, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Lead {
@@ -90,7 +91,7 @@ export default function AdminLeadsPage() {
   useEffect(() => {
     // Fetch telecallers for filter/assign dropdown
     supabase.from('users').select('id,name').eq('role', 'telecaller').eq('is_active', true)
-      .then(({ data }) => setTelecallers(data || []));
+      .then(({ data }) => setTelecallers(data || []), console.error);
     fetchLeads();
   }, [fetchLeads, supabase]);
 
@@ -130,11 +131,7 @@ export default function AdminLeadsPage() {
       l.name, l.phone, l.email || '', l.status,
       l.assigned_telecaller?.name || 'Unassigned', l.created_at
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'leads.csv'; a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(headers, rows, 'leads.csv');
   };
 
   // Filter by search query

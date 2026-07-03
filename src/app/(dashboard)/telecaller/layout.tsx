@@ -6,8 +6,8 @@ export default async function TelecallerLayout({ children }: { children: React.R
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
-  const { data: profile } = await supabase.from('users').select('name, role').eq('id', user.id).single();
-  if (!profile || profile.role !== 'telecaller') redirect('/login');
+  const { data: profile, error: profileError } = await supabase.from('users').select('name, role').eq('id', user.id).single();
+  if (profileError || !profile || profile.role !== 'telecaller') redirect('/login');
   
   return <TelecallerLayoutClient profile={profile}>{children}</TelecallerLayoutClient>;
 }

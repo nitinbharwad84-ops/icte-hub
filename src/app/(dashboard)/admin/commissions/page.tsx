@@ -222,9 +222,11 @@ export default function CommissionsPage() {
                   const telecallerName = telecallerId ? telecallerMap.get(telecallerId) || 'Unknown' : 'Unassigned';
                   const amount = commission.amount ?? commission.college?.commission_percent;
                   const amountDisplay = amount != null ? formatCurrency(amount) : '—';
-                  const commissionType = commission.college?.commission_structure
-                    ? commission.college.commission_structure === 'one-time' ? 'One-time' : 'Installments'
-                    : '—';
+                  const commissionType = commission.college?.commission_structure === 'one-time'
+                    ? 'One-time'
+                    : commission.college?.commission_structure === 'installments'
+                      ? 'Installments'
+                      : '—';
 
                   return (
                     <tr key={commission.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">

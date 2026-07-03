@@ -29,3 +29,10 @@ export const LEAD_STATUSES = ['new', 'contacted', 'interested', 'not-interested'
 export const INSTITUTE_LEAD_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
 export const PARTNER_INQUIRY_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
 export const CALL_OUTCOMES = ['interested', 'not-interested', 'call-back-later', 'no-answer'] as const;
+
+export const NAV_ITEMS = [
+  { id: 'universities', label: 'Universities', href: '/colleges' },
+  { id: 'courses', label: 'Courses', href: '#' },
+  { id: 'programs', label: 'Programs', href: '#' },
+  { id: 'get-help', label: 'Get Help', href: '#' },
+] as const;

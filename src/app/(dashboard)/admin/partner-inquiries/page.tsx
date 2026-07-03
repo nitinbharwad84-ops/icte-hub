@@ -8,6 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/lib/utils/formatters';
 import { PARTNER_INQUIRY_STATUSES } from '@/lib/utils/constants';
+import { downloadCsv } from '@/lib/utils/csv';
 import { Download, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface PartnerInquiry {
@@ -66,11 +67,7 @@ export default function PartnerInquiriesPage() {
       i.college_name, i.contact_person || '', i.email || '', i.phone || '', i.city || '',
       i.status, i.created_at,
     ]);
-    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'partner-inquiries.csv'; a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(headers, rows, 'partner-inquiries.csv');
   };
 
   return (

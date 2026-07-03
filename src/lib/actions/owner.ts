@@ -128,7 +128,8 @@ export async function resetAdminPasswordAction(userId: string) {
 
   if (error) return { success: false, error: error.message };
 
-  await supabase.from('users').update({ must_change_password: true }).eq('id', userId);
+  const { error: updateError } = await supabase.from('users').update({ must_change_password: true }).eq('id', userId);
+  if (updateError) return { success: false, error: updateError.message };
 
   return { success: true, tempPassword };
 }

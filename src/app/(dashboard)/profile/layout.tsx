@@ -7,13 +7,13 @@ export default async function ProfileLayout({ children }: { children: React.Reac
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('users')
     .select('name, email, role')
     .eq('id', user.id)
     .single();
 
-  if (!profile) redirect('/login');
+  if (profileError || !profile) redirect('/login');
 
   return (
     <AdminLayoutClient user={profile}>

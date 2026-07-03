@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { IcteLogo } from '@/components/shared/IcteLogo';
+import { NAV_ITEMS } from '@/lib/utils/constants';
 import { Button } from '@/components/ui/Button';
 import { X } from 'lucide-react';
 
@@ -17,10 +18,10 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600" aria-label="Close navigation menu"><X className="w-6 h-6" /></button>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          {['Universities', 'Courses', 'Programs', 'Get Help'].map((item) => (
-            <Link key={item} href={item === 'Universities' ? '/colleges' : '#'}
+          {NAV_ITEMS.map((item) => (
+            <Link key={item.id} href={item.href}
               className="block text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 hover:bg-slate-100 px-3 py-3 rounded-lg transition-all"
-              onClick={onClose}>{item}
+              onClick={onClose}>{item.label}
             </Link>
           ))}
         </nav>

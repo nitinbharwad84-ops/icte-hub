@@ -87,7 +87,7 @@ export default function InstituteCoursesPage() {
 
   useEffect(() => {
     supabase.from('partner_inquiries').select('id,college_name').order('college_name')
-      .then(({ data }) => setInstitutes(data || []));
+      .then(({ data }) => setInstitutes(data || []), console.error);
     fetchCourses();
   }, [fetchCourses, supabase]);
 

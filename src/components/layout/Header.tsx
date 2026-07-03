@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { IcteLogo } from '@/components/shared/IcteLogo';
+import { NAV_ITEMS } from '@/lib/utils/constants';
 import { Button } from '@/components/ui/Button';
 import { Menu } from 'lucide-react';
 import { MobileDrawer } from './MobileDrawer';
@@ -17,10 +18,10 @@ export function Header() {
             <IcteLogo size={32} />
           </Link>
           <nav className="hidden md:flex items-center gap-1">
-            {['Universities', 'Courses', 'Programs'].map((item) => (
-              <Link key={item} href={item === 'Universities' ? '/colleges' : '#'}
+            {NAV_ITEMS.slice(0, 3).map((item) => (
+              <Link key={item.id} href={item.href}
                 className="text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-900 hover:bg-slate-100 px-3 py-2 rounded-lg transition-all">
-                {item}
+                {item.label}
               </Link>
             ))}
             <Link href="/login"><Button variant="primary" size="sm">Login</Button></Link>

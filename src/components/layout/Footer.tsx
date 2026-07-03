@@ -30,7 +30,7 @@ export function Footer() {
           <div>
             <h4 className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500 mb-4">Contact</h4>
             <ul className="space-y-3">
-              <li className="flex items-center gap-2 text-sm text-slate-400"><Phone className="w-4 h-4 text-slate-500" /> +91 XXXXX XXXXX</li>
+              <li className="flex items-center gap-2 text-sm text-slate-400"><Phone className="w-4 h-4 text-slate-500" /> +91 1800-123-4567</li>
               <li className="flex items-center gap-2 text-sm text-slate-400"><Mail className="w-4 h-4 text-slate-500" /> info@ictehub.com</li>
               <li className="flex items-center gap-2 text-sm text-slate-400"><MapPin className="w-4 h-4 text-slate-500" /> New Delhi, India</li>
             </ul>

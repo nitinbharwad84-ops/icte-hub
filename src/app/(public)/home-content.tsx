@@ -13,7 +13,7 @@ import { CategoryTile } from '@/components/shared/CategoryTile';
 import { InquiryModal } from '@/components/shared/InquiryModal';
 import { InstituteInquiryModal } from '@/components/shared/InstituteInquiryModal';
 import { IcteLogo } from '@/components/shared/IcteLogo';
-import { CATEGORIES } from '@/lib/utils/constants';
+import { CATEGORIES, NAV_ITEMS } from '@/lib/utils/constants';
 import { getSessionId, getSource } from '@/lib/utils/session';
 import { Search, Star, GraduationCap, CheckCircle, MapPin, ArrowRight } from 'lucide-react';
 
@@ -93,12 +93,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
     router.push(`/colleges?${params.toString()}`);
   };
 
-  const navLinks = [
-    { id: 'universities', label: 'Universities' },
-    { id: 'courses', label: 'Courses' },
-    { id: 'programs', label: 'Programs' },
-    { id: 'get-help', label: 'Get Help' },
-  ];
+  const navLinks = NAV_ITEMS;
 
   return (
     <>
