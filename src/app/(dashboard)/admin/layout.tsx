@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     .single();
 
   if (profileError || !profile) redirect('/login');
+  if (!['admin', 'owner'].includes(profile.role)) redirect('/login');
 
   return (
     <AdminLayoutClient user={profile}>

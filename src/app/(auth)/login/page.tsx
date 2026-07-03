@@ -42,7 +42,7 @@ export default function LoginPage() {
         router.push(`/${profile?.role || 'telecaller'}`);
       }
     }
-    router.refresh();
+
   };
 
   return (
