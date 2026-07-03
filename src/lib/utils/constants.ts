@@ -25,6 +25,4 @@ export const CATEGORIES = [
   { abbr: 'BCom', name: 'Commerce & Finance', icon: 'Calculator' },
 ];
 
-export const LEAD_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'enrolled-college', 'enrolled-institute'] as const;
 export const CALL_OUTCOMES = ['interested', 'not-interested', 'call-back-later', 'no-answer'] as const;
-export const COLLEGE_MODES = ['Online', 'Offline'] as const;

@@ -8,7 +8,8 @@ import { Modal } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
-import { Search, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, Upload } from 'lucide-react';
+import { compressLogo } from '@/lib/utils/image-compression';
 
 interface College {
   id: string;
@@ -20,6 +21,7 @@ interface College {
   website: string | null;
   description: string | null;
   status: string;
+  logo_url?: string | null;
   created_at: string;
 }
 
@@ -40,6 +42,8 @@ export default function AdminCollegesPage() {
   const [form, setForm] = useState<FormData>(defaultForm);
   const [saving, setSaving] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const supabase = createClient();
 
   const fetchColleges = useCallback(async () => {
@@ -59,6 +63,8 @@ export default function AdminCollegesPage() {
   const openAddModal = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setLogoFile(null);
+    setLogoPreview(null);
     setModalOpen(true);
   };
 

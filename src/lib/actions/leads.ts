@@ -3,14 +3,17 @@
 import { z } from 'zod';
 import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { revalidatePath } from 'next/cache';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
-const leadRatelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(50, '15 m'),
-  analytics: true,
-});
+let ratelimit: Ratelimit | null = null;
+try {
+  ratelimit = new Ratelimit({
+    redis: Redis.fromEnv(),
+    limiter: Ratelimit.slidingWindow(50, '15 m'),
+  });
+} catch {}
 
 const LeadSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -24,52 +27,32 @@ const LeadSchema = z.object({
 type LeadInput = z.infer<typeof LeadSchema>;
 
 export async function createLeadAction(data: LeadInput) {
-  const ip = (await headers()).get('x-forwarded-for') ?? 'unknown';
-  const { success } = await leadRatelimit.limit(ip);
-  if (!success) return { error: 'Too many attempts. Try again later.', success: false };
+  if (ratelimit) {
+    const ip = (await headers()).get('x-forwarded-for') ?? 'unknown';
+    const { success } = await ratelimit.limit(ip);
+    if (!success) return { error: 'Too many requests. Try again later.', success: false };
+  }
 
   const parsed = LeadSchema.safeParse(data);
   if (!parsed.success) {
     return { error: parsed.error.flatten().fieldErrors, success: false };
   }
 
-  try {
-    // TODO: Integrate with Supabase backend
-    return { success: true, message: 'Inquiry submitted successfully!' };
-  } catch {
-    return { error: 'Something went wrong. Please try again.', success: false };
-  }
-}
-
-export async function updateLeadStatusAction(leadId: string, status: string) {
   const supabase = await createClient();
-  const { error } = await supabase
-    .from('leads')
-    .update({ status })
-    .eq('id', leadId);
-  if (error) throw new Error(error.message);
-  return { success: true };
-}
 
-export async function assignTelecallerAction(leadId: string, telecallerId: string | null) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('leads')
-    .update({ assigned_telecaller_id: telecallerId })
-    .eq('id', leadId);
-  if (error) throw new Error(error.message);
-  return { success: true };
-}
+  const { error } = await supabase.from('leads').insert({
+    name: parsed.data.name,
+    phone: parsed.data.phone,
+    email: parsed.data.email || null,
+    interested_college_ids: parsed.data.college_ids?.length ? parsed.data.college_ids : [],
+    course_id: parsed.data.course_id || null,
+    message: parsed.data.message || null,
+    source: 'direct',
+  });
 
-export async function getCallHistoryAction(leadId: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('call_logs')
-    .select('*')
-    .eq('lead_id', leadId)
-    .order('call_date', { ascending: false });
-  if (error) throw new Error(error.message);
-  return data;
+  if (error) return { error: error.message, success: false };
+  revalidatePath('/admin');
+  return { success: true, message: 'Inquiry submitted successfully!' };
 }
 
 export async function checkLeadStatus(_prevState: { found: boolean; submitted: boolean }, formData: FormData) {
