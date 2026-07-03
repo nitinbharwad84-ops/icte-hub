@@ -54,6 +54,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
   const [formEmail, setFormEmail] = useState('');
   const [selectedCollegeForm, setSelectedCollegeForm] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const heroRef = useRef<HTMLElement>(null);
   const router = useRouter();
@@ -96,6 +97,11 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
   };
 
   const handleSubmit = async () => {
+    if (!formName.trim() || !formPhone.trim()) {
+      setFormError('Please fill in all required fields');
+      return;
+    }
+    setFormError('');
     const result = await createLeadAction({
       name: formName,
       phone: formPhone,
@@ -410,6 +416,11 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
                         </label>
                       ))}
                     </div>
+                  </div>
+                )}
+                {formError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">
+                    {formError}
                   </div>
                 )}
                 {showSuccess && (

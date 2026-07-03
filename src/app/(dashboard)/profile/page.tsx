@@ -33,24 +33,32 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setLoading(false); return; }
 
-      const { data: profile } = await supabase
-        .from('users')
-        .select('name, email, phone, role, profile_picture_url')
-        .eq('id', user.id)
-        .single();
+        const { data: profile, error } = await supabase
+          .from('users')
+          .select('name, email, phone, role, profile_picture_url')
+          .eq('id', user.id)
+          .single();
 
-      if (profile) {
-        setName(profile.name || '');
-        setEmail(profile.email || '');
-        setPhone(profile.phone || '');
-        setRole(profile.role || '');
-        setProfilePicUrl(profile.profile_picture_url || null);
-        setProfilePicPreview(profile.profile_picture_url || null);
+        if (error) throw error;
+
+        if (profile) {
+          setName(profile.name || '');
+          setEmail(profile.email || '');
+          setPhone(profile.phone || '');
+          setRole(profile.role || '');
+          setProfilePicUrl(profile.profile_picture_url || null);
+          setProfilePicPreview(profile.profile_picture_url || null);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error('Failed to load profile:', err);
+        setError('Failed to load profile');
+        setLoading(false);
       }
-      setLoading(false);
     }
     loadProfile();
   }, [supabase]);
