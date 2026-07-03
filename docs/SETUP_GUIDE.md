@@ -47,7 +47,7 @@ npm install
 Copy the template and fill in your values:
 
 ```bash
-cp .env.local .env.local
+cp .env.example .env.local
 ```
 
 Edit `.env.local` with your credentials (see [Section 4](#4-environment-variables)).
