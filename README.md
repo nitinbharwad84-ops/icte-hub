@@ -129,6 +129,7 @@ src/
 ├── middleware.ts           # Auth: role routing + forced password change
 └── styles/globals.css     # Tailwind + custom animations
 supabase/migrations/       # 17 SQL migration files (001 → 016)
+supabase/seed/             # 10 SQL seed files (owner creation + dummy data + cleanup)
 docs/                      # Design docs, setup guide
 ```
 
@@ -259,6 +260,23 @@ Run in order (`001` → `016`) via Supabase SQL Editor.
 | `015_colleges_extended.sql` | Extended college fields |
 | `015_page_visits_lead_sessions.sql` | Page visit & session tracking |
 | `016_partner_inquiries_extend.sql` | Extended partner inquiry fields |
+
+## Seed Data
+
+Run in order after migrations are applied.
+
+| File | Description |
+|------|-------------|
+| `001_create_owner.sql` | ⚠️ **Edit email/password first** — creates the owner user |
+| `002_colleges.sql` | 10 sample colleges/universities |
+| `003_institute_courses.sql` | 10 ICTE direct programs |
+| `004_leads.sql` | 16 student leads linked to colleges |
+| `005_institute_leads.sql` | 8 direct enrollment inquiries |
+| `006_call_logs.sql` | Sample call logs (requires telecaller) |
+| `007_commissions.sql` | Sample commission records |
+| `008_partner_inquiries.sql` | 7 partner form submissions |
+| `009_page_visits.sql` | Visitor tracking + page view data |
+| `010_cleanup.sql` | ⚠️ **Deletes ALL data + users** — resets everything |
 
 ---
 
