@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate, formatPhone } from '@/lib/utils/formatters';
+import { LEAD_STATUSES } from '@/lib/utils/constants';
 import { Search, Download, Phone, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Lead {
@@ -168,7 +169,7 @@ export default function AdminLeadsPage() {
             />
           </div>
           <Select
-            options={[{ value: '', label: 'All Statuses' }, ...['new', 'contacted', 'interested', 'not-interested', 'enrolled-college', 'enrolled-institute'].map(s => ({ value: s, label: s.replace('-', ' ') }))]}
+            options={[{ value: '', label: 'All Statuses' }, ...LEAD_STATUSES.map(s => ({ value: s, label: s.replace('-', ' ') }))]}
             value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           />
           <Select
@@ -241,7 +242,7 @@ export default function AdminLeadsPage() {
                             onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
                             className="text-[10px] bg-transparent border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-brand-blue"
                           >
-                            {['new', 'contacted', 'interested', 'not-interested', 'enrolled-college', 'enrolled-institute'].map(s => (
+                            {LEAD_STATUSES.map(s => (
                               <option key={s} value={s}>{s.replace('-', ' ')}</option>
                             ))}
                           </select>

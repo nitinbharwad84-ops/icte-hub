@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/lib/utils/formatters';
+import { PARTNER_INQUIRY_STATUSES } from '@/lib/utils/constants';
 import { Download, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface PartnerInquiry {
@@ -20,8 +21,6 @@ interface PartnerInquiry {
   status: string;
   created_at: string;
 }
-
-const INQUIRY_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
 
 export default function PartnerInquiriesPage() {
   const [inquiries, setInquiries] = useState<PartnerInquiry[]>([]);
@@ -93,7 +92,7 @@ export default function PartnerInquiriesPage() {
           <Select
             options={[
               { value: '', label: 'All Statuses' },
-              ...INQUIRY_STATUSES.map(s => ({ value: s, label: s.replace('-', ' ') })),
+              ...PARTNER_INQUIRY_STATUSES.map(s => ({ value: s, label: s.replace('-', ' ') })),
             ]}
             value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           />
@@ -145,7 +144,7 @@ export default function PartnerInquiriesPage() {
                           onChange={(e) => handleStatusUpdate(inquiry.id, e.target.value)}
                           className="text-[10px] bg-transparent border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-brand-blue"
                         >
-                          {INQUIRY_STATUSES.map(s => (
+                          {PARTNER_INQUIRY_STATUSES.map(s => (
                             <option key={s} value={s}>{s.replace('-', ' ')}</option>
                           ))}
                         </select>

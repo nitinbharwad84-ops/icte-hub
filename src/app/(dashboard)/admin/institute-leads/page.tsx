@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/lib/utils/formatters';
+import { INSTITUTE_LEAD_STATUSES } from '@/lib/utils/constants';
 import { Download, Search } from 'lucide-react';
 
 interface InstituteLead {
@@ -19,8 +20,6 @@ interface InstituteLead {
   status: string;
   created_at: string;
 }
-
-const INSTITUTE_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
 
 export default function InstituteLeadsPage() {
   const [leads, setLeads] = useState<InstituteLead[]>([]);
@@ -107,7 +106,7 @@ export default function InstituteLeadsPage() {
           <Select
             options={[
               { value: '', label: 'All Statuses' },
-              ...INSTITUTE_STATUSES.map(s => ({ value: s, label: s.replace('-', ' ') })),
+              ...INSTITUTE_LEAD_STATUSES.map(s => ({ value: s, label: s.replace('-', ' ') })),
             ]}
             value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
           />
@@ -154,7 +153,7 @@ export default function InstituteLeadsPage() {
                         onChange={(e) => handleStatusUpdate(lead.id, e.target.value)}
                         className="text-[10px] bg-transparent border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-brand-blue"
                       >
-                        {INSTITUTE_STATUSES.map(s => (
+                        {INSTITUTE_LEAD_STATUSES.map(s => (
                           <option key={s} value={s}>{s.replace('-', ' ')}</option>
                         ))}
                       </select>

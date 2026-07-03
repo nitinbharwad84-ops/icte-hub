@@ -1,4 +1,3 @@
-'use client';
 import { Badge } from '@/components/ui/Badge';
 import { STATUS_LABELS } from '@/lib/utils/constants';
 

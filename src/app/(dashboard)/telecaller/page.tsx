@@ -78,8 +78,13 @@ export default function TelecallerLeadsPage() {
   };
 
   const handleStatusUpdate = async (leadId: string, newStatus: string) => {
-    await supabase.from('leads').update({ status: newStatus }).eq('id', leadId);
-    fetchLeads();
+    const { error } = await supabase.from('leads').update({ status: newStatus }).eq('id', leadId);
+    if (error) {
+      console.error('Status update failed:', error);
+      alert('Failed to update status. Please try again.');
+    } else {
+      fetchLeads();
+    }
   };
 
   const handleLogCall = async (leadId: string, formData: FormData) => {

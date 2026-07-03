@@ -14,7 +14,7 @@ export function MobileDrawer({ open, onClose }: MobileDrawerProps) {
       <div className="fixed top-0 left-0 z-50 w-72 h-full bg-white border-r border-slate-200/80 shadow-xl flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-slate-100">
           <IcteLogo size={28} />
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X className="w-6 h-6" /></button>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600" aria-label="Close navigation menu"><X className="w-6 h-6" /></button>
         </div>
         <nav className="flex-1 p-4 space-y-1">
           {['Universities', 'Courses', 'Programs', 'Get Help'].map((item) => (

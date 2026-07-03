@@ -9,20 +9,19 @@ export default async function CollegesPage({
   const supabase = await createClient();
   const params = await searchParams;
 
-  const { data: allColleges } = await supabase.from('colleges').select('*').order('name');
+  const search = params.search || '';
+  const mode = params.mode || '';
+  let query = supabase.from('colleges').select('*');
+  if (search) query = query.ilike('name', `%${search}%`);
+  if (mode && mode !== 'All') query = query.eq('mode', mode);
+  query = query.order('name');
+  const { data: colleges } = await query;
 
-  const total = allColleges?.length || 0;
-  const online = allColleges?.filter(c => c.mode === 'Online').length || 0;
-  const offline = allColleges?.filter(c => c.mode === 'Offline').length || 0;
+  const total = colleges?.length || 0;
+  const online = colleges?.filter(c => c.mode === 'Online').length || 0;
+  const offline = colleges?.filter(c => c.mode === 'Offline').length || 0;
 
-  let filtered = allColleges || [];
-  if (params.search) {
-    const q = params.search.toLowerCase();
-    filtered = filtered.filter(c => c.name.toLowerCase().includes(q));
-  }
-  if (params.mode && params.mode !== 'All') {
-    filtered = filtered.filter(c => c.mode === params.mode);
-  }
+  const filtered = colleges || [];
 
   return (
     <div className="min-h-screen">

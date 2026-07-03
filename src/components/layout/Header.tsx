@@ -25,7 +25,7 @@ export function Header() {
             ))}
             <Link href="/login"><Button variant="primary" size="sm">Login</Button></Link>
           </nav>
-          <button onClick={() => setDrawerOpen(true)} className="md:hidden text-slate-600 p-2">
+          <button onClick={() => setDrawerOpen(true)} className="md:hidden text-slate-600 p-2" aria-label="Open navigation menu">
             <Menu className="w-6 h-6" />
           </button>
         </div>

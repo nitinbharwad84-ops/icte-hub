@@ -25,4 +25,7 @@ export const CATEGORIES = [
   { abbr: 'BCom', name: 'Commerce & Finance', icon: 'Calculator' },
 ];
 
+export const LEAD_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'enrolled-college', 'enrolled-institute'] as const;
+export const INSTITUTE_LEAD_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
+export const PARTNER_INQUIRY_STATUSES = ['new', 'contacted', 'interested', 'not-interested', 'converted'] as const;
 export const CALL_OUTCOMES = ['interested', 'not-interested', 'call-back-later', 'no-answer'] as const;
