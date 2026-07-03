@@ -1,0 +1,242 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
+import { Badge } from '@/components/ui/Badge';
+import { Alert } from '@/components/ui/Alert';
+import { Spinner } from '@/components/ui/Spinner';
+import { User, Mail, Phone, Lock, KeyRound, Save } from 'lucide-react';
+
+export default function ProfilePage() {
+  const supabase = createClient();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState('');
+
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  useEffect(() => {
+    async function loadProfile() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('users')
+        .select('name, email, phone, role')
+        .eq('id', user.id)
+        .single();
+
+      if (profile) {
+        setName(profile.name || '');
+        setEmail(profile.email || '');
+        setPhone(profile.phone || '');
+        setRole(profile.role || '');
+      }
+      setLoading(false);
+    }
+    loadProfile();
+  }, [supabase]);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setSaving(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setError('Session expired. Please login again.');
+      setSaving(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({ name, phone })
+      .eq('id', user.id);
+
+    if (updateError) {
+      setError(updateError.message);
+    } else {
+      setSuccess('Profile updated successfully');
+    }
+    setSaving(false);
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (newPassword !== confirmPassword) {
+      setError('New passwords do not match');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+    if (currentPassword === newPassword) {
+      setError('New password must differ from current password');
+      return;
+    }
+
+    setChangingPassword(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) {
+      setError('Session expired. Please login again.');
+      setChangingPassword(false);
+      return;
+    }
+
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      setError('Current password is incorrect');
+      setChangingPassword(false);
+      return;
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
+    if (updateError) {
+      setError(updateError.message);
+      setChangingPassword(false);
+      return;
+    }
+
+    setSuccess('Password changed successfully');
+    setCurrentPassword('');
+    setNewPassword('');
+    setConfirmPassword('');
+    setChangingPassword(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Spinner size={32} />
+      </div>
+    );
+  }
+
+  const roleColor = role === 'owner' ? 'purple' : role === 'admin' ? 'indigo' : 'blue';
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-2xl font-extrabold text-slate-900">Profile</h1>
+        <p className="text-sm text-slate-500 mt-1">Manage your account settings</p>
+      </div>
+
+      {error && <Alert variant="error">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
+
+      {/* Profile Info Card */}
+      <Card glass className="!p-6 !rounded-2xl">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-400 flex items-center justify-center text-white text-2xl font-bold">
+            {name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h2 className="text-lg font-extrabold text-slate-900">{name}</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-sm text-slate-500">{email}</span>
+              <Badge color={roleColor as any}>{role}</Badge>
+            </div>
+          </div>
+        </div>
+        <form onSubmit={handleSaveProfile} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              icon={<User className="w-4 h-4" />}
+              required
+            />
+            <Input
+              label="Email"
+              value={email}
+              icon={<Mail className="w-4 h-4" />}
+              disabled
+            />
+            <Input
+              label="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              icon={<Phone className="w-4 h-4" />}
+            />
+            <Input
+              label="Role"
+              value={role.charAt(0).toUpperCase() + role.slice(1)}
+              icon={<User className="w-4 h-4" />}
+              disabled
+            />
+          </div>
+          <div className="flex justify-end">
+            <Button type="submit" loading={saving}>
+              <Save className="w-4 h-4" /> Save Changes
+            </Button>
+          </div>
+        </form>
+      </Card>
+
+      {/* Change Password Card */}
+      <Card glass className="!p-6 !rounded-2xl">
+        <div className="flex items-center gap-3 mb-6">
+          <Lock className="w-5 h-5 text-slate-400" />
+          <h2 className="text-lg font-extrabold text-slate-900">Change Password</h2>
+        </div>
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <Input
+            label="Current Password"
+            type="password"
+            placeholder="Enter current password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            icon={<Lock className="w-4 h-4" />}
+            required
+          />
+          <Input
+            label="New Password"
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            icon={<KeyRound className="w-4 h-4" />}
+            required
+          />
+          <Input
+            label="Confirm New Password"
+            type="password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            icon={<KeyRound className="w-4 h-4" />}
+            required
+          />
+          <div className="flex justify-end">
+            <Button type="submit" loading={changingPassword}>
+              <Lock className="w-4 h-4" /> Update Password
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+}
