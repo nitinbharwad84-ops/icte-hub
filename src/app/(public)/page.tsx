@@ -13,8 +13,8 @@ export default async function HomePage() {
       supabase.from('colleges').select('*', { count: 'exact' }).limit(6),
       supabase.from('institute_courses').select('*', { count: 'exact' }),
     ]);
-    colleges = collegesRes.data ?? [];
-    courses = coursesRes.data ?? [];
+    colleges = (collegesRes.data ?? []) as typeof colleges;
+    courses = (coursesRes.data ?? []) as typeof courses;
     collegeCount = collegesRes.count ?? colleges.length;
     courseCount = coursesRes.count ?? courses.length;
   } catch (err) {
