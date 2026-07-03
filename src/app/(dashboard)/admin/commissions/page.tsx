@@ -40,7 +40,7 @@ export default function CommissionsPage() {
     setLoading(true);
     setError('');
 
-    const [telecallersResult, telecallersError] = await supabase
+    const { data: telecallersResult, error: telecallersError } = await supabase
       .from('users')
       .select('id, name');
 
