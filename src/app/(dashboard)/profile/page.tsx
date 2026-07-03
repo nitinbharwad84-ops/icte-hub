@@ -149,6 +149,8 @@ export default function ProfilePage() {
       return;
     }
 
+    await supabase.from('users').update({ must_change_password: false }).eq('id', user.id);
+
     setSuccess('Password changed successfully');
     setCurrentPassword('');
     setNewPassword('');

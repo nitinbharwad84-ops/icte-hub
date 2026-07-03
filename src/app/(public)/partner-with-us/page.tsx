@@ -2,6 +2,8 @@
 
 import { useActionState } from 'react';
 
+export const dynamic = 'force-dynamic';
+
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { createPartnerInquiry } from '@/lib/actions/colleges';

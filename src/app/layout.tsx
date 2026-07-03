@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 export const metadata: Metadata = {
   title: 'ICTE Hub - Find Your Right University',
   description: 'Compare colleges, get free counseling, and find the right university for your future with ICTE Hub.',
+  icons: [{ rel: 'icon', url: '/favicon.svg', type: 'image/svg+xml' }],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

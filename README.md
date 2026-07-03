@@ -55,9 +55,9 @@
 ### 🌐 Public Pages
 
 - **Home** — Hero, stats, featured colleges, categories, degree programs, smart search, CTA
-- **College Browse** — Search + mode filter (Online/Offline) + grid layout
-- **Check Status** — Look up lead status by name + phone
-- **Partner With Us** — Institute partner inquiry form
+- **College Browse** — Search + mode filter (Online/Offline) + grid layout (navbar: Universities)
+- **Check Status** — Look up lead status by name + phone (navbar link)
+- **Partner With Us** — Institute partner inquiry form (navbar link)
 - **Legal** — Privacy Policy, Terms of Service, Disclaimer
 
 ### 🔐 Admin Dashboard (`/admin`)

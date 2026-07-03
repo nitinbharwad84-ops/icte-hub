@@ -70,7 +70,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
   }, []);
 
   useEffect(() => {
-    const sectionIds = ['universities', 'courses', 'programs', 'get-help'];
+    const sectionIds = ['universities', 'check-status', 'partner'];
     const observers: IntersectionObserver[] = [];
     sectionIds.forEach((id) => {
       const el = document.getElementById(id);

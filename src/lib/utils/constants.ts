@@ -32,7 +32,6 @@ export const CALL_OUTCOMES = ['interested', 'not-interested', 'call-back-later',
 
 export const NAV_ITEMS = [
   { id: 'universities', label: 'Universities', href: '/colleges' },
-  { id: 'courses', label: 'Courses', href: '#' },
-  { id: 'programs', label: 'Programs', href: '#' },
-  { id: 'get-help', label: 'Get Help', href: '#' },
+  { id: 'check-status', label: 'Check Status', href: '/check-status' },
+  { id: 'partner', label: 'Partner With Us', href: '/partner-with-us' },
 ] as const;

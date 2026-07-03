@@ -61,6 +61,8 @@ export default function ChangePasswordPage() {
       return;
     }
 
+    await supabase.from('users').update({ must_change_password: false }).eq('id', user.id);
+
     router.push('/');
     router.refresh();
   };
