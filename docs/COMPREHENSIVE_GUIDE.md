@@ -1041,7 +1041,6 @@ Leads are sorted by score descending so admins can prioritize high-intent studen
 
 | Action | Limit | Window | Why |
 |--------|-------|--------|-----|
-| Login attempts | 20 | 15 minutes per IP | Prevent brute force |
 | Lead creation | 50 | 15 minutes per IP | Prevent spam submissions |
 
 Rate limiting uses **Upstash Ratelimit** with sliding window algorithm, stored in Redis.
@@ -1088,7 +1087,7 @@ import { Redis } from '@upstash/redis';
 
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),     // Uses UPSTASH_REDIS_REST_URL + TOKEN
-  limiter: Ratelimit.slidingWindow(20, '15 m'),  // 20 requests per 15 minutes
+  limiter: Ratelimit.slidingWindow(50, '15 m'),  // 50 requests per 15 minutes
   analytics: true,            // Track rate limit events
 });
 ```
@@ -1103,10 +1102,11 @@ const ratelimit = new Ratelimit({
 
 ### What's Rate Limited
 
-| Action | Limit | When Bypassed |
-|--------|-------|---------------|
-| `loginAction` | 20/15min per IP | Never — protects auth endpoint |
-| `createLeadAction` | 50/15min per IP | Never — prevents spam |
+| Action | Limit | Description |
+|--------|-------|-------------|
+| `createLeadAction` | 50/15min per IP | Prevents spam lead submissions |
+
+Login rate limiting is handled by Supabase Auth's built-in brute-force protection. The application does not implement its own login rate limit.
 
 ---
 

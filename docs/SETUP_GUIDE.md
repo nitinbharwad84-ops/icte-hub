@@ -128,7 +128,15 @@ Supabase Auth needs configuration for email/password login:
    - Under **General → Email Confirmations**, disable "Confirm signup" and "Secure email change".
 4. Under **Authentication → Settings → Auth Hooks**, ensure no hooks are required for this setup.
 
-### 3.5 Create Initial Admin Account
+### 3.5 Verify Trigger and Create Initial Admin Account
+
+After running all migrations, verify the user-sync trigger is active:
+
+```sql
+SELECT * FROM pg_trigger WHERE tgname = 'on_auth_user_created';
+```
+
+If the trigger is missing, re-run the relevant portion of `012_triggers.sql` manually.
 
 1. Go to **Authentication → Users** in Supabase dashboard.
 2. Click **Invite user** or **Add user**.
@@ -174,14 +182,23 @@ If missing, run `014_storage_buckets.sql` manually in SQL Editor.
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Supabase → Settings → API → anon public |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key | Supabase → Settings → API → service_role (keep secret!) |
 
-### 4.2 Optional (Rate Limiting)
+### 4.2 Optional (Rate Limiting — Upstash)
 
-| Variable | Description | Where to Get |
-|----------|-------------|-------------|
-| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL | Upstash Console → Database → REST API |
-| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token | Upstash Console → Database → REST API |
+Rate limiting protects the lead creation endpoint from spam. To set it up:
 
-> If Upstash is not configured, rate limiting is skipped — app still works.
+1. Go to [console.upstash.com](https://console.upstash.com) and log in or create a free account.
+2. Create a new **Redis** database (name it e.g. `icte-hub-ratelimit`).
+3. Once created, open the database and go to the **Details** tab.
+4. Copy the **REST URL** (looks like `https://...upstash.io`).
+5. Copy the **REST Token** (a long string).
+6. Add both to your `.env.local` file:
+
+```env
+UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-rest-token-here
+```
+
+If Upstash is not configured, rate limiting is skipped and the app still works (a warning `Rate limiter not available` appears in the server console).
 
 ### 4.3 `.env.local` Template
 
@@ -312,6 +329,33 @@ UPDATE public.users SET must_change_password = false WHERE email = 'admin@exampl
 
 **Problem:** Image upload fails.
 **Fix:** Check storage bucket exists and RLS policies are active. Re-run `014_storage_buckets.sql`.
+
+**Problem:** Profile picture upload fails.
+**Fix:** Check that storage bucket `profile_pictures` exists in Supabase Storage. Verify RLS policies allow authenticated users to upload.
+
+### 7.6 Misc Issues
+
+**Problem:** Account deactivated — silently logged out, can't access dashboard.
+**Fix:** Check `is_active` status for the user in the Team page (`/admin/team`). Set `is_active = true` to restore access.
+
+**Problem:** Rate limiting not working (no blocking of spam leads).
+**Fix:** Verify `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are set in `.env.local`. Check the server console for `Rate limiter not available` warning.
+
+**Problem:** CSV export fails (download doesn't start or is empty).
+**Fix:** Check browser console for errors. Ensure Supabase connection is active and the query returns data.
+
+**Problem:** Tracking data not appearing in Hot Leads (`/admin/hot-leads`).
+**Fix:** Verify the `/tracking` POST route is accessible via middleware (not blocked for unauthenticated users). Check browser console for POST errors.
+
+**Problem:** Commission not auto-created when lead enrolls.
+**Fix:** Ensure lead status is exactly `enrolled-college` (not misspelled or different casing). Verify the trigger `handle_lead_enrolled` is active:
+
+```sql
+SELECT * FROM pg_trigger WHERE tgname = 'handle_lead_enrolled';
+```
+
+**Problem:** Check Status returns "No inquiry found".
+**Fix:** Try an exact name match. Phone must be exactly 10 digits without spaces or formatting.
 
 ---
 

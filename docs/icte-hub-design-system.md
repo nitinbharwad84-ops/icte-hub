@@ -24,7 +24,7 @@
 ### 1.3 Favicon
 - **Type**: Inline SVG data URI (embedded in `index.html`)
 - **Design**: Blue rounded rectangle (`#1E40FF` fill, `rx=8`) with "ICTE" white bold text centered.
-- **Note**: There is also a `favicon.svg` file in `client/public/` (9.5 KB) that appears unused in favor of the inline data URI.
+- **Note**: There is also a `favicon.svg` file in `public/favicon.svg` (278 bytes) used by the browser for a scalable vector favicon.
 
 ---
 

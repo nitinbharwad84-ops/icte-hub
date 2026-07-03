@@ -89,7 +89,7 @@
 - **CSV Export** — Shared utility for downloading leads, inquiries, and reports
 - **Behavioral Tracking** — Anonymous visitor tracking, engagement scoring
 - **Audit Logging** — All mutations logged via database triggers
-- **Rate Limiting** — Login (20/15min), lead creation (50/15min) via Upstash
+- **Rate Limiting** — Lead creation (50/15min via Upstash); login protected by Supabase Auth built-in brute-force protection
 - **RLS** — Row Level Security for role-based data access
 - **Error Pages** — Branded 404 (`not-found.tsx`) and error boundaries (`error.tsx`) for root, public, and dashboard layouts
 - **Responsive** — Mobile-first design, desktop sidebar + mobile drawer
@@ -123,14 +123,14 @@ src/
 ├── components/
 │   ├── layout/            # Header, Footer, Sidebars, MobileDrawer
 │   ├── shared/            # StatusBadge, CollegeCard, InquiryModal
-│   └── ui/                # 10 primitives: Button, Card, Modal, etc.
+│   └── ui/                # 9 primitives: Button, Card, Modal, etc.
 ├── lib/
 │   ├── actions/           # Server Actions (leads, auth, team, owner)
 │   ├── supabase/          # client.ts, server.ts, admin.ts
 │   └── utils/             # cn, constants, csv, formatters, session, image-compression
 ├── middleware.ts           # Auth: role routing + forced password change
 └── styles/globals.css     # Tailwind + custom animations
-supabase/migrations/       # 17 SQL migration files (001 → 016)
+supabase/migrations/       # 17 SQL migration files (001 → 016, with two `015_` files)
 supabase/seed/             # 10 SQL seed files (owner creation + dummy data + cleanup)
 docs/                      # Design docs, comprehensive guide, setup guide
 ```
@@ -236,14 +236,14 @@ The UI follows a consistent design system defined in [docs/icte-hub-design-syste
 
 - **🎨 Colors:** Brand blue (`#1E40FF`), brand light (`#EEF2FF`), brand orange (`#FFA94D`)
 - **📝 Typography:** Inter font · 10px uppercase tracking-widest for labels · 12-14px for body
-- **🧩 Components:** 10 reusable UI primitives — Button, Card, Input, Modal, Select, Table, Badge, Skeleton, Spinner, Alert
+- **🧩 Components:** 9 reusable UI primitives — Button, Card, Input, Modal, Select, Badge, Skeleton, Spinner, Alert (Table removed — uses native HTML tables)
 - **🪟 Cards:** Glass morphism · 2rem border radius · subtle shadows · hover elevation
 
 ---
 
 ## Database Migrations
 
-Run in order (`001` → `016`) via Supabase SQL Editor.
+Run in order (001 → 016) via Supabase SQL Editor. There are 17 `.sql` files total (two files share the `015_` prefix).
 
 | File | Description |
 |------|-------------|
