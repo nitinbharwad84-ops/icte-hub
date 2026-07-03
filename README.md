@@ -91,6 +91,7 @@
 - **Audit Logging** — All mutations logged via database triggers
 - **Rate Limiting** — Login (20/15min), lead creation (50/15min) via Upstash
 - **RLS** — Row Level Security for role-based data access
+- **Error Pages** — Branded 404 (`not-found.tsx`) and error boundaries (`error.tsx`) for root, public, and dashboard layouts
 - **Responsive** — Mobile-first design, desktop sidebar + mobile drawer
 
 </div>

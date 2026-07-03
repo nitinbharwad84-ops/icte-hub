@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '*.supabase.co' },
     ],
   },
-  outputFileTracing: false,
 };
 
 export default nextConfig;
