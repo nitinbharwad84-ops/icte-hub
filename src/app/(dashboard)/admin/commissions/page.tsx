@@ -8,7 +8,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
 import { formatDate, formatCurrency } from '@/lib/utils/formatters';
-import { CheckCircle, DollarSign, Clock, BarChart3 } from 'lucide-react';
+import { CheckCircle, Clock, BarChart3 } from 'lucide-react';
 
 interface Commission {
   id: string;
