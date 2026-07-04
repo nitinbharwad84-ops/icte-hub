@@ -13,12 +13,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, error, icon, dark, ...props }, ref) => (
     <div className="w-full">
       {label && (
-        <label className="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">{label}</label>
+        <label htmlFor={props.id} className="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">{label}</label>
       )}
       <div className="relative">
         {icon && <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">{icon}</div>}
         <input
           ref={ref}
+          id={props.id}
           className={cn(
             'w-full rounded-xl text-sm font-semibold transition-all duration-200 outline-none',
             icon ? 'pl-11 pr-4 py-3' : 'px-4 py-3',

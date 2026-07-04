@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import { CollegeCard } from '@/components/shared/CollegeCard';
@@ -22,6 +22,7 @@ export function CollegesContent({ colleges, total, online, offline }: { colleges
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [mode, setMode] = useState(searchParams.get('mode') || 'All');
   const [inquireOpen, setInquireOpen] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const updateFilters = (newSearch: string, newMode: string) => {
     const params = new URLSearchParams();
@@ -33,7 +34,10 @@ export function CollegesContent({ colleges, total, online, offline }: { colleges
 
   const handleSearch = (value: string) => {
     setSearch(value);
-    updateFilters(value, mode);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      updateFilters(value, mode);
+    }, 300);
   };
 
   const handleModeChange = (newMode: string) => {
@@ -62,7 +66,7 @@ export function CollegesContent({ colleges, total, online, offline }: { colleges
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search colleges or courses..."
+                placeholder="Search colleges or courses..." aria-label="Search colleges"
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full pl-12 pr-10 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 font-semibold focus:border-brand-blue/50 focus:ring-2 focus:ring-brand-blue/15 outline-none transition-all"

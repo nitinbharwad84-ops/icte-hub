@@ -73,6 +73,7 @@ export default function AdminTeamPage() {
   };
 
   const handleToggleActive = async (id: string, current: boolean) => {
+    if (current && !window.confirm('Are you sure you want to deactivate this telecaller?')) return;
     setTogglingId(id);
     setError('');
     const result = await toggleUserActiveAction(id, !current);

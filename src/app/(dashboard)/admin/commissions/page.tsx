@@ -88,6 +88,7 @@ export default function CommissionsPage() {
   }, [fetchCommissions]);
 
   const handleMarkAsPaid = async (commissionId: string) => {
+    if (!window.confirm('Mark this commission as paid?')) return;
     setUpdatingId(commissionId);
     const { error: updateError } = await supabase
       .from('commissions')

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
 import { MapPin, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
@@ -95,12 +96,12 @@ export function CollegeCard({ college, onInquire }: CollegeCardProps) {
         )}
 
         {onInquire && (
-          <button
+          <Button
             onClick={() => onInquire(college.id)}
-            className="w-full bg-slate-900 hover:bg-indigo-600 rounded-xl text-white text-xs font-bold uppercase tracking-wider py-2.5 px-5 transition-all duration-200"
+            className="w-full"
           >
             Request Info
-          </button>
+          </Button>
         )}
       </div>
     </Card>

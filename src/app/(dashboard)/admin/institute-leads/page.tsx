@@ -95,7 +95,7 @@ export default function InstituteLeadsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
-              type="text" placeholder="Search institute, person, or email..."
+              type="text" placeholder="Search institute, person, or email..." aria-label="Search institute leads"
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm outline-none focus:border-brand-blue/50"
             />

@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
+import { Alert } from '@/components/ui/Alert';
 import { formatDate, formatPhone } from '@/lib/utils/formatters';
 import { CALL_OUTCOMES } from '@/lib/utils/constants';
 import { ChevronDown, ChevronUp, Phone } from 'lucide-react';
@@ -30,6 +31,7 @@ interface CallLog {
 export default function TelecallerLeadsPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [callLogs, setCallLogs] = useState<Record<string, CallLog[]>>({});
   const [callLogsLoading, setCallLogsLoading] = useState(false);
@@ -82,22 +84,23 @@ export default function TelecallerLeadsPage() {
   };
 
   const handleStatusUpdate = async (leadId: string, newStatus: string) => {
-    const { error } = await supabase.from('leads').update({ status: newStatus }).eq('id', leadId);
-    if (error) {
-      console.error('Status update failed:', error);
-      alert('Failed to update status. Please try again.');
+    const { error: updateError } = await supabase.from('leads').update({ status: newStatus }).eq('id', leadId);
+    if (updateError) {
+      setError('Failed to update status: ' + updateError.message);
     } else {
+      setError('');
       fetchLeads();
     }
   };
 
   const handleLogCall = async (leadId: string, formData: FormData) => {
     setSubmittingCall(leadId);
+    setError('');
     const outcome = formData.get('outcome') as string;
     const notes = formData.get('notes') as string;
     const { error: callError } = await supabase.from('call_logs').insert({ lead_id: leadId, outcome, notes });
     if (callError) {
-      console.error('Failed to log call:', callError);
+      setError('Failed to log call: ' + callError.message);
       setSubmittingCall(null);
       return;
     }
@@ -118,6 +121,8 @@ export default function TelecallerLeadsPage() {
           <p className="text-sm text-slate-500 mt-1">{leads.length} assigned leads</p>
         </div>
       </div>
+
+      {error && <Alert variant="error" className="mb-4">{error}</Alert>}
 
       {loading ? (
         <div className="flex justify-center py-16"><Spinner size={32} /></div>

@@ -14,7 +14,7 @@ const variants = {
   primary: 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/40',
   secondary: 'bg-white/80 backdrop-blur-md border border-slate-200 text-slate-700 hover:bg-white',
   dark: 'bg-slate-900 hover:bg-brand-blue text-white',
-  danger: 'text-red-500 hover:text-red-700 hover:bg-red-50',
+  danger: 'bg-red-500 hover:bg-red-600 text-white',
   ghost: 'text-slate-500 hover:text-slate-900 hover:bg-slate-100',
 };
 

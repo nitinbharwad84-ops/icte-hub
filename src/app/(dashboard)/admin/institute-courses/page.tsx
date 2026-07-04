@@ -86,8 +86,10 @@ export default function InstituteCoursesPage() {
   }, [supabase]);
 
   useEffect(() => {
-    supabase.from('partner_inquiries').select('id,college_name').order('college_name')
-      .then(({ data }) => setInstitutes(data || []), console.error);
+    (async () => {
+      const { data } = await supabase.from('partner_inquiries').select('id,college_name').order('college_name');
+      if (data) setInstitutes(data);
+    })();
     fetchCourses();
   }, [fetchCourses, supabase]);
 
@@ -180,7 +182,7 @@ export default function InstituteCoursesPage() {
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            type="text" placeholder="Search by course name..."
+            type="text" placeholder="Search by course name..." aria-label="Search courses"
             value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm outline-none focus:border-brand-blue/50"
           />
@@ -231,6 +233,7 @@ export default function InstituteCoursesPage() {
                           onClick={() => handleOpenEdit(course)}
                           className="text-slate-400 hover:text-brand-blue transition-colors"
                           title="Edit"
+                          aria-label="Edit course"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -238,6 +241,7 @@ export default function InstituteCoursesPage() {
                           onClick={() => handleDelete(course.id)}
                           className="text-slate-400 hover:text-red-500 transition-colors"
                           title="Delete"
+                          aria-label="Delete course"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

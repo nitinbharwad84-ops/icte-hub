@@ -13,11 +13,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, label, error, options, ...props }, ref) => (
     <div className="w-full">
       {label && (
-        <label className="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">{label}</label>
+        <label htmlFor={props.id} className="block text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1.5">{label}</label>
       )}
       <div className="relative">
         <select
           ref={ref}
+          id={props.id}
           className={cn(
             'w-full appearance-none rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-800 font-semibold px-4 py-3 pr-10 focus:border-brand-blue/50 focus:ring-2 focus:ring-brand-blue/15 outline-none transition-all',
             error && 'border-red-500', className

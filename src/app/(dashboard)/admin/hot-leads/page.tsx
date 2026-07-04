@@ -156,10 +156,11 @@ export default function HotLeadsPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
+          <label htmlFor="min-score" className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Min Score
           </label>
           <input
+            id="min-score"
             type="number"
             min={0}
             max={100}
@@ -198,6 +199,7 @@ export default function HotLeadsPage() {
                     <tr
                       className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
                       onClick={() => handleExpand(lead.id)}
+                      tabIndex={0} role="button" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleExpand(lead.id); } }}
                     >
                       <td className="p-4 font-semibold text-slate-800">{lead.name}</td>
                       <td className="p-4 text-slate-600">{formatPhone(lead.phone)}</td>

@@ -47,6 +47,7 @@ export default function AdminLeadsPage() {
   const [expandedLead, setExpandedLead] = useState<string | null>(null);
   const [callHistory, setCallHistory] = useState<CallLog[]>([]);
   const [callHistoryLoading, setCallHistoryLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
   const supabase = createClient();
 
   const fetchLeads = useCallback(async () => {
@@ -97,8 +98,10 @@ export default function AdminLeadsPage() {
 
   useEffect(() => {
     // Fetch telecallers for filter/assign dropdown
-    supabase.from('users').select('id,name').eq('role', 'telecaller').eq('is_active', true)
-      .then(({ data }) => setTelecallers(data || []), console.error);
+    (async () => {
+      const { data } = await supabase.from('users').select('id,name').eq('role', 'telecaller').eq('is_active', true);
+      if (data) setTelecallers(data);
+    })();
     fetchLeads();
   }, [fetchLeads, supabase]);
 
@@ -146,6 +149,7 @@ export default function AdminLeadsPage() {
     l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     l.phone.includes(searchQuery)
   );
+  const paginatedLeads = filteredLeads.slice(0, visibleCount);
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -167,7 +171,7 @@ export default function AdminLeadsPage() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
-              type="text" placeholder="Search name or phone..."
+              type="text" placeholder="Search name or phone..." aria-label="Search leads"
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm outline-none focus:border-brand-blue/50"
             />
@@ -207,7 +211,7 @@ export default function AdminLeadsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredLeads.map((lead) => (
+                {paginatedLeads.map((lead) => (
                   <React.Fragment key={lead.id}>
                     <tr className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
                       <td className="p-4 font-semibold text-slate-800">{lead.name}</td>
@@ -289,6 +293,13 @@ export default function AdminLeadsPage() {
               </tbody>
             </table>
           </div>
+          {filteredLeads.length > visibleCount && (
+            <div className="flex justify-center py-4">
+              <Button variant="secondary" onClick={() => setVisibleCount(v => v + 20)}>
+                Load More ({filteredLeads.length - visibleCount} remaining)
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>

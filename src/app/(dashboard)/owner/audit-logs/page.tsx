@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -27,18 +27,26 @@ export default function AuditLogsListPage() {
   const [error, setError] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedSearch(value), 400);
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError('');
-    const result = await getInternalUsersAction(search || undefined, roleFilter);
+    const result = await getInternalUsersAction(debouncedSearch || undefined, roleFilter);
     if (result.success) {
       setUsers(result.data);
     } else {
       setError(result.error ?? 'An error occurred');
     }
     setLoading(false);
-  }, [search, roleFilter]);
+  }, [debouncedSearch, roleFilter]);
 
   useEffect(() => {
     fetchUsers();
@@ -71,9 +79,9 @@ export default function AuditLogsListPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by name or email..." aria-label="Search audit logs"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:border-brand-blue/50 focus:ring-2 focus:ring-brand-blue/15 outline-none transition-all"
           />
         </div>
@@ -111,6 +119,7 @@ export default function AuditLogsListPage() {
                     key={u.id}
                     className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
                     onClick={() => router.push(`/owner/audit-logs/${u.id}`)}
+                    tabIndex={0} role="button" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/owner/audit-logs/${u.id}`); } }}
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">

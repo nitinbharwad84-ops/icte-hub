@@ -204,6 +204,7 @@ export default function OwnerAdminsPage() {
                           size="sm"
                           loading={resettingId === admin.id}
                           onClick={() => handleResetPassword(admin.id)}
+                          aria-label="Reset password"
                         >
                           <Key className="w-3.5 h-3.5" />
                         </Button>

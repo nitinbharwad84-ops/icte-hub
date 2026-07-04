@@ -56,6 +56,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
   const [selectedCollegeForm, setSelectedCollegeForm] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const heroRef = useRef<HTMLElement>(null);
   const router = useRouter();
@@ -108,16 +109,20 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
       return;
     }
     setFormError('');
+    setSubmitting(true);
     const result = await createLeadAction({
       name: formName,
       phone: formPhone,
       email: formEmail || undefined,
       college_ids: selectedCollegeForm.length > 0 ? selectedCollegeForm : undefined,
     });
+    setSubmitting(false);
     if (result.success) {
       setFormName(''); setFormPhone(''); setFormEmail(''); setSelectedCollegeForm([]);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 5000);
+    } else {
+      setFormError(typeof result.error === 'string' ? result.error : 'Submission failed. Please try again.');
     }
   };
 
@@ -125,18 +130,6 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
 
   return (
     <>
-      <style jsx>{`
-        @keyframes blob {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(30px, -30px) scale(1.1); }
-          50% { transform: translate(-20px, 20px) scale(0.9); }
-          75% { transform: translate(20px, 30px) scale(1.05); }
-        }
-        .animate-blob { animation: blob 10s ease-in-out infinite; }
-        .animate-blob-delayed { animation: blob 13s ease-in-out infinite reverse; }
-        .animate-blob-slow { animation: blob 8s ease-in-out infinite 2s; }
-      `}</style>
-
       {/* ============ SECTION 1: HERO ============ */}
       <section ref={heroRef} className="relative overflow-hidden py-24 lg:py-32">
         <div className="absolute inset-0 -z-10">
@@ -179,7 +172,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
             {navLinks.map((link) => (
               <a
                 key={link.id}
-                href={`#${link.id}`}
+                href={link.href}
                 className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                   activeSection === link.id
                     ? 'bg-indigo-50 text-indigo-600'
@@ -434,7 +427,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
                     Inquiry submitted successfully! We'll contact you shortly.
                   </div>
                 )}
-                <Button className="w-full" onClick={handleSubmit}>
+                <Button className="w-full" onClick={handleSubmit} loading={submitting} disabled={submitting}>
                   Submit Inquiry
                 </Button>
               </div>

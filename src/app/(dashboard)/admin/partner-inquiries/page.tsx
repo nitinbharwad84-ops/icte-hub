@@ -126,6 +126,7 @@ export default function PartnerInquiriesPage() {
                     <tr
                       className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer"
                       onClick={() => setExpandedId(expandedId === inquiry.id ? null : inquiry.id)}
+                      tabIndex={0} role="button" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(expandedId === inquiry.id ? null : inquiry.id); } }}
                     >
                       <td className="p-4 font-semibold text-slate-800">{inquiry.college_name}</td>
                       <td className="p-4 text-slate-600">{inquiry.contact_person || '—'}</td>

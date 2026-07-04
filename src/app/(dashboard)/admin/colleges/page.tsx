@@ -102,12 +102,11 @@ export default function AdminCollegesPage() {
     setError('');
 
     try {
-      const collegeId = editingId || crypto.randomUUID();
       let logoUrl: string | null = null;
 
       if (logoFile) {
         const compressed = await compressLogo(logoFile);
-        const filePath = `${collegeId}.webp`;
+        const filePath = `${Date.now()}.webp`;
         const { error: uploadError } = await supabase.storage
           .from('college_logos')
           .upload(filePath, compressed, { contentType: 'image/webp', upsert: true });
@@ -132,7 +131,7 @@ export default function AdminCollegesPage() {
         const { error: updateError } = await supabase.from('colleges').update(payload).eq('id', editingId);
         if (updateError) throw new Error(updateError.message);
       } else {
-        const { error: insertError } = await supabase.from('colleges').insert({ id: collegeId, ...payload });
+        const { error: insertError } = await supabase.from('colleges').insert(payload);
         if (insertError) throw new Error(insertError.message);
       }
 
@@ -176,7 +175,7 @@ export default function AdminCollegesPage() {
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            type="text" placeholder="Search by name or city..."
+            type="text" placeholder="Search by name or city..." aria-label="Search colleges"
             value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-50 border border-slate-200 text-sm outline-none focus:border-brand-blue/50"
           />
@@ -236,10 +235,10 @@ export default function AdminCollegesPage() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => openEditModal(college)} className="text-slate-400 hover:text-indigo-500 transition-colors" title="Edit">
+                        <button onClick={() => openEditModal(college)} className="text-slate-400 hover:text-indigo-500 transition-colors" title="Edit" aria-label="Edit college">
                           <Pencil className="w-4 h-4" />
                         </button>
-                        <button onClick={() => setDeleteConfirm(college.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Delete">
+                        <button onClick={() => setDeleteConfirm(college.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Delete" aria-label="Delete college">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -326,7 +325,7 @@ export default function AdminCollegesPage() {
           <p className="text-sm text-slate-500 mb-6">This action cannot be undone.</p>
           <div className="flex justify-center gap-3">
             <Button variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
-            <Button variant="dark" className="!bg-red-500 hover:!bg-red-600" onClick={() => handleDelete(deleteConfirm!)}>Delete</Button>
+            <Button variant="danger" onClick={() => handleDelete(deleteConfirm!)}>Delete</Button>
           </div>
         </div>
       </Modal>
