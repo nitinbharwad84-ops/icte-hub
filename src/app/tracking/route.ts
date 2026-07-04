@@ -9,16 +9,9 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     if (action === 'view_college') {
-      const { data: existing, error: fetchErr } = await supabase.from('visitors').select('viewed_colleges').eq('session_id', session_id).single();
-      if (fetchErr) {
-        console.error('Tracking fetch error (view_college):', fetchErr);
-        return NextResponse.json({ success: false, error: fetchErr.message }, { status: 500 });
-      }
-      const viewed = existing?.viewed_colleges || [];
       const newView = { college_id: payload.college_id, college_name: payload.college_name, viewed_at: new Date().toISOString() };
-      viewed.push(newView);
       const { error: upsertErr } = await supabase.from('visitors').upsert(
-        { session_id, viewed_colleges: viewed, last_seen_at: new Date().toISOString() },
+        { session_id, viewed_colleges: [newView], last_seen_at: new Date().toISOString() },
         { onConflict: 'session_id' }
       );
       if (upsertErr) {
@@ -26,15 +19,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: upsertErr.message }, { status: 500 });
       }
     } else if (action === 'filter_change') {
-      const { data: existing, error: fetchErr } = await supabase.from('visitors').select('mode_filters_used').eq('session_id', session_id).single();
-      if (fetchErr) {
-        console.error('Tracking fetch error (filter_change):', fetchErr);
-        return NextResponse.json({ success: false, error: fetchErr.message }, { status: 500 });
-      }
-      const modes = existing?.mode_filters_used || [];
-      if (!modes.includes(payload.mode)) modes.push(payload.mode);
       const { error: upsertErr } = await supabase.from('visitors').upsert(
-        { session_id, mode_filters_used: modes, last_seen_at: new Date().toISOString() },
+        { session_id, mode_filters_used: [payload.mode], last_seen_at: new Date().toISOString() },
         { onConflict: 'session_id' }
       );
       if (upsertErr) {

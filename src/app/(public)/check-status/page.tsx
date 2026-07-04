@@ -11,8 +11,7 @@ import { STATUS_DESCRIPTIONS } from '@/lib/utils/constants';
 import { formatDate } from '@/lib/utils/formatters';
 
 type CheckStatusState = {
-  found: boolean;
-  submitted: boolean;
+  success: boolean;
   error?: string;
   leads?: Array<{
     name: string;
@@ -25,8 +24,7 @@ type CheckStatusState = {
 export default function CheckStatusPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [state, formAction, pending] = useActionState(checkLeadStatus as any, {
-    found: false,
-    submitted: false,
+    success: false,
   } as CheckStatusState);
 
   return (
@@ -66,7 +64,7 @@ export default function CheckStatusPage() {
         {state.error && (
           <p className="text-center text-sm text-red-500 py-2">{state.error}</p>
         )}
-        {state.found && state.leads && (
+        {state.success && state.leads && state.leads.length > 0 && (
           <div className="space-y-4 pt-4 border-t border-slate-100">
             <p className="text-sm font-bold uppercase tracking-wider text-slate-400">
               {state.leads.length === 1 ? '1 Result Found' : `${state.leads.length} Results Found`}
@@ -93,7 +91,7 @@ export default function CheckStatusPage() {
           </div>
         )}
 
-        {state.submitted && !state.found && (
+        {state.success && state.leads && state.leads.length === 0 && (
           <p className="text-center text-sm text-slate-400 py-4">
             No inquiry found with those details. Please check your information and try again.
           </p>

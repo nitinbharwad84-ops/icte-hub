@@ -60,11 +60,11 @@ const CheckStatusSchema = z.object({
   phone: z.string().regex(/^\d{10,}$/, 'Phone must be at least 10 digits'),
 });
 
-export async function checkLeadStatus(_prevState: { found: boolean; submitted: boolean }, formData: FormData) {
+export async function checkLeadStatus(_prevState: { success: boolean }, formData: FormData) {
   try {
     const raw = Object.fromEntries(formData.entries());
     const parsed = CheckStatusSchema.safeParse(raw);
-    if (!parsed.success) return { found: false, submitted: false, error: parsed.error.errors[0].message };
+    if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
 
     const supabase = await createClient();
     const { data } = await supabase
@@ -73,9 +73,9 @@ export async function checkLeadStatus(_prevState: { found: boolean; submitted: b
       .ilike('name', parsed.data.name)
       .eq('phone', parsed.data.phone);
 
-    if (!data || data.length === 0) return { found: false, submitted: true, leads: [] };
-    return { found: true, submitted: true, leads: data };
+    if (!data || data.length === 0) return { success: true, leads: [] };
+    return { success: true, leads: data };
   } catch (e) {
-    return { found: false, submitted: false, error: e instanceof Error ? e.message : 'An error occurred' };
+    return { success: false, error: e instanceof Error ? e.message : 'An error occurred' };
   }
 }

@@ -51,110 +51,156 @@ export async function getAdminsAction() {
 }
 
 export async function createAdminAction(name: string, email: string, password: string) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'Unauthorized' };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized' };
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-  if (!profile || profile.role !== 'owner') {
-    return { success: false, error: 'Unauthorized' };
+    if (!profile || profile.role !== 'owner') {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+      user_metadata: { name, role: 'admin', created_by: user.id },
+    });
+
+    if (error) return { success: false, error: error.message };
+    return { success: true, userId: data.user.id, tempPassword: password };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred' };
   }
-
-  const adminClient = createAdminClient();
-  const { data, error } = await adminClient.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-    user_metadata: { name, role: 'admin', created_by: user.id },
-  });
-
-  if (error) return { success: false, error: error.message };
-  return { success: true, userId: data.user.id, tempPassword: password };
 }
 
 export async function toggleAdminActiveAction(userId: string, isActive: boolean) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'Unauthorized' };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized' };
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-  if (!profile || profile.role !== 'owner') {
-    return { success: false, error: 'Unauthorized' };
+    if (!profile || profile.role !== 'owner') {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: isActive })
+      .eq('id', userId);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred' };
   }
+}
 
-  const { error } = await supabase
-    .from('users')
-    .update({ is_active: isActive })
-    .eq('id', userId);
+export async function toggleUserActiveAction(userId: string, isActive: boolean) {
+  try {
+    const supabase = await createClient();
 
-  if (error) return { success: false, error: error.message };
-  return { success: true };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized' };
+
+    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+    if (!profile || !['admin', 'owner'].includes(profile.role)) {
+      return { success: false, error: 'Not authorized — only admins and owners can manage users' };
+    }
+
+    const { error } = await supabase
+      .from('users')
+      .update({ is_active: isActive })
+      .eq('id', userId);
+
+    if (error) return { success: false, error: error.message };
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred' };
+  }
 }
 
 export async function resetAdminPasswordAction(userId: string) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'Unauthorized' };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized' };
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-  if (!profile || profile.role !== 'owner') {
-    return { success: false, error: 'Unauthorized' };
+    if (!profile || profile.role !== 'owner') {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const tempPassword = crypto.randomUUID().slice(0, 12) + 'Aa1!';
+
+    const adminClient = createAdminClient();
+    const { error } = await adminClient.auth.admin.updateUserById(userId, {
+      password: tempPassword,
+    });
+
+    if (error) return { success: false, error: error.message };
+
+    const { error: updateError } = await adminClient.from('users').update({ must_change_password: true }).eq('id', userId);
+    if (updateError) return { success: false, error: updateError.message };
+
+    return { success: true, tempPassword };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred' };
   }
-
-  const tempPassword = crypto.randomUUID().slice(0, 12) + 'Aa1!';
-
-  const adminClient = createAdminClient();
-  const { error } = await adminClient.auth.admin.updateUserById(userId, {
-    password: tempPassword,
-  });
-
-  if (error) return { success: false, error: error.message };
-
-  const { error: updateError } = await adminClient.from('users').update({ must_change_password: true }).eq('id', userId);
-  if (updateError) return { success: false, error: updateError.message };
-
-  return { success: true, tempPassword };
 }
 
 export async function deleteAdminAction(userId: string) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'Unauthorized' };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized' };
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-  if (!profile || profile.role !== 'owner') {
-    return { success: false, error: 'Unauthorized' };
+    if (!profile || profile.role !== 'owner') {
+      return { success: false, error: 'Unauthorized' };
+    }
+
+    const adminClient = createAdminClient();
+    const { error } = await adminClient.auth.admin.deleteUser(userId);
+
+    if (error) {
+      const msg = error.message?.toLowerCase() || '';
+      if (msg.includes('foreign') || msg.includes('constraint') || msg.includes('violates')) {
+        return { success: false, error: 'Cannot delete user — they have related records (leads, audit logs, etc.). Remove those first or contact support.' };
+      }
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred' };
   }
-
-  const adminClient = createAdminClient();
-  const { error } = await adminClient.auth.admin.deleteUser(userId);
-
-  if (error) return { success: false, error: error.message };
-  return { success: true };
 }
 
 export async function getInternalUsersAction(search?: string, roleFilter?: string) {
@@ -258,41 +304,45 @@ export async function getUserAuditLogsAction(
   actionFilter?: string,
   entityFilter?: string
 ) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { success: false, error: 'Unauthorized', data: [], count: 0 };
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: 'Unauthorized', data: [], count: 0 };
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('role')
-    .eq('id', user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
 
-  if (!profile || profile.role !== 'owner') {
-    return { success: false, error: 'Unauthorized', data: [], count: 0 };
+    if (!profile || profile.role !== 'owner') {
+      return { success: false, error: 'Unauthorized', data: [], count: 0 };
+    }
+
+    let query = supabase
+      .from('audit_logs')
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (actionFilter) {
+      query = query.eq('action', actionFilter);
+    }
+
+    if (entityFilter) {
+      query = query.eq('target_entity', entityFilter);
+    }
+
+    const from = (page - 1) * pageSize;
+    const to = from + pageSize - 1;
+    query = query.range(from, to);
+
+    const { data, error, count } = await query;
+
+    if (error) return { success: false, error: error.message, data: [], count: 0 };
+    return { success: true, data: data || [], count: count || 0 };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'An error occurred', data: [], count: 0 };
   }
-
-  let query = supabase
-    .from('audit_logs')
-    .select('*', { count: 'exact' })
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (actionFilter) {
-    query = query.eq('action', actionFilter);
-  }
-
-  if (entityFilter) {
-    query = query.eq('target_entity', entityFilter);
-  }
-
-  const from = (page - 1) * pageSize;
-  const to = from + pageSize - 1;
-  query = query.range(from, to);
-
-  const { data, error, count } = await query;
-
-  if (error) return { success: false, error: error.message, data: [], count: 0 };
-  return { success: true, data: data || [], count: count || 0 };
 }

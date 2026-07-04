@@ -7,7 +7,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Alert } from '@/components/ui/Alert';
 import { formatDate } from '@/lib/utils/formatters';
 import { createTelecallerAction, getTelecallersAction } from '@/lib/actions/team';
-import { toggleUserActiveAction } from '@/lib/actions/auth';
+import { toggleUserActiveAction } from '@/lib/actions/owner';
 import { UserPlus, UserCog, Phone, Mail, Clock, Shield, Activity, Key } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
