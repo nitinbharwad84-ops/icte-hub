@@ -7,6 +7,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'dark' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
+  formAction?: string;
 }
 
 const variants = {
@@ -29,6 +30,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         size === 'lg' && 'px-6 py-3 rounded-xl',
         variants[variant],
         (disabled || loading) && 'opacity-50 cursor-not-allowed',
+        'active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2',
         className
       )}
       {...props}

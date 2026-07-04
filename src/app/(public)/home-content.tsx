@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Badge } from '@/components/ui/Badge';
 import { CollegeCard } from '@/components/shared/CollegeCard';
 import { StatsCounter } from '@/components/shared/StatsCounter';
@@ -101,6 +102,11 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
       setFormError('Please fill in all required fields');
       return;
     }
+    const phoneRegex = /^\d{10,15}$/;
+    if (!phoneRegex.test(formPhone.trim())) {
+      setFormError('Please enter a valid phone number (10+ digits)');
+      return;
+    }
     setFormError('');
     const result = await createLeadAction({
       name: formName,
@@ -149,7 +155,7 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
                 Discover accredited partner colleges offering distance, online, and offline degree programs. Request a free counseling session and secure your admission today.
               </p>
               <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
-                <Button onClick={() => setInquiryOpen(true)}>
+                <Button type="button" onClick={() => setInquiryOpen(true)}>
                   Get Free Consultation
                 </Button>
                 <Link href="/colleges">
@@ -269,24 +275,24 @@ export function HomeContent({ colleges, courses, collegeCount, courseCount }: Ho
           <p className="text-slate-400 mb-8">Search through our extensive list of partner colleges and degree programs.</p>
           <div className="flex flex-col sm:flex-row gap-3 max-w-2xl mx-auto">
             <div className="flex-1">
-              <input
-                type="text"
+              <Input
+                dark
                 placeholder="Search by keyword, program, or college..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-slate-400 px-4 py-3 text-sm font-semibold outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all"
               />
             </div>
-            <select
+            <Select
+              options={[
+                { value: '', label: 'All Modes' },
+                { value: 'Online', label: 'Online' },
+                { value: 'Offline', label: 'Offline' },
+              ]}
               value={modeFilter}
               onChange={(e) => setModeFilter(e.target.value)}
-              className="rounded-xl bg-white/10 border border-white/20 text-white px-4 py-3 text-sm font-semibold outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all appearance-none cursor-pointer"
-            >
-              <option value="All" className="text-slate-900">All Modes</option>
-              <option value="Online" className="text-slate-900">Online</option>
-              <option value="Offline" className="text-slate-900">Offline</option>
-            </select>
+              className="bg-white/10 border-white/20 text-white [&>option]:text-slate-900"
+            />
             <Button onClick={handleSearch} className="bg-gradient-to-r from-indigo-600 to-purple-600">
               <Search className="w-4 h-4" />
               Search

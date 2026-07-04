@@ -56,6 +56,8 @@ export default function OwnerAdminsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    if (!formName.trim()) { setFormError('Name is required'); return; }
+    if (!formEmail.trim() || !formEmail.includes('@')) { setFormError('Valid email is required'); return; }
     setCreating(true);
     const result = await createAdminAction(formName, formEmail, formPassword);
     if (result.success) {
@@ -72,6 +74,8 @@ export default function OwnerAdminsPage() {
   };
 
   const handleToggleActive = async (id: string, current: boolean) => {
+    const action = current ? 'deactivate' : 'activate';
+    if (!window.confirm(`Are you sure you want to ${action} this admin?`)) return;
     setTogglingId(id);
     setError('');
     const result = await toggleAdminActiveAction(id, !current);

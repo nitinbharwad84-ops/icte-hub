@@ -11,7 +11,7 @@ const formSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   phone: z.string().regex(/^\d{10}$/, 'Phone must be exactly 10 digits'),
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
-  course_id: z.string().min(1, 'Please select a course'),
+  enrolled_institute_course_id: z.string().min(1, 'Please select a course'),
   message: z.string().optional(),
 });
 
@@ -29,7 +29,7 @@ interface InstituteInquiryModalProps {
 }
 
 export function InstituteInquiryModal({ open, onClose, courses }: InstituteInquiryModalProps) {
-  const [form, setForm] = useState<FormData>({ name: '', phone: '', email: '', course_id: '', message: '' });
+  const [form, setForm] = useState<FormData>({ name: '', phone: '', email: '', enrolled_institute_course_id: '', message: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -57,7 +57,7 @@ export function InstituteInquiryModal({ open, onClose, courses }: InstituteInqui
 
     if (res.success) {
       setSuccess(res.message || 'Inquiry submitted successfully!');
-      setForm({ name: '', phone: '', email: '', course_id: '', message: '' });
+      setForm({ name: '', phone: '', email: '', enrolled_institute_course_id: '', message: '' });
     } else {
       setServerError(typeof res.error === 'string' ? res.error : 'Submission failed. Please try again.');
     }
@@ -106,9 +106,9 @@ export function InstituteInquiryModal({ open, onClose, courses }: InstituteInqui
               { value: '', label: 'Choose a course...' },
               ...courses.map((c) => ({ value: c.id, label: c.name })),
             ]}
-            value={form.course_id}
-            onChange={(e) => setForm({ ...form, course_id: e.target.value })}
-            error={errors.course_id}
+value={form.enrolled_institute_course_id}
+onChange={(e) => setForm({ ...form, enrolled_institute_course_id: e.target.value })}
+error={errors.enrolled_institute_course_id}
           />
 
           <div>

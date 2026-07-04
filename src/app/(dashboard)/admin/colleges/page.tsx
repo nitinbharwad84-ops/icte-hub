@@ -96,7 +96,8 @@ export default function AdminCollegesPage() {
   };
 
   const handleSave = async () => {
-    if (!form.name.trim()) { setError('Name is required'); return; }
+    if (!form.name.trim()) { setError('College name is required'); return; }
+    if (form.website && !/^https?:\/\//.test(form.website)) { setError('Website must start with http:// or https://'); return; }
     setSaving(true);
     setError('');
 

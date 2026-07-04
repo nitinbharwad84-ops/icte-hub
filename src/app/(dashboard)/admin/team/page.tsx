@@ -55,6 +55,8 @@ export default function AdminTeamPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    if (!formEmail.trim() || !formEmail.includes('@')) { setFormError('Valid email is required'); return; }
+    if (formPhone && !/^\d{10,}$/.test(formPhone.trim())) { setFormError('Phone must be at least 10 digits'); return; }
     setCreating(true);
     const result = await createTelecallerAction(formName, formEmail, formPhone);
     if (result.success) {

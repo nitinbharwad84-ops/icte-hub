@@ -35,6 +35,13 @@ function LoginForm() {
     setError('');
     setLoading(true);
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email');
+      setLoading(false);
+      return;
+    }
+
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
       const newAttempts = loginAttempts + 1;

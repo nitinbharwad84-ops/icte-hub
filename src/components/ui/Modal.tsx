@@ -8,9 +8,17 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   className?: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export function Modal({ open, onClose, children, className }: ModalProps) {
+const sizeClasses = {
+  sm: 'max-w-sm',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+};
+
+export function Modal({ open, onClose, children, className, size = 'md' }: ModalProps) {
   const handleEscape = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
   }, [onClose]);
@@ -31,7 +39,7 @@ export function Modal({ open, onClose, children, className }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className={cn('relative bg-white rounded-[2rem] shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto', className)}>
+      <div className={cn('relative bg-white rounded-[2rem] shadow-2xl w-full mx-4 max-h-[90vh] overflow-y-auto', sizeClasses[size], className)}>
         <button onClick={onClose} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors" aria-label="Close dialog">
           <X className="w-5 h-5" />
         </button>
