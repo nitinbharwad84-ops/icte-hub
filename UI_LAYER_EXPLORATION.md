@@ -1,18 +1,21 @@
-# UI Layer — Current State (as of v1.1.0)
+# UI Layer — Current State (as of v1.1.1)
 
 ## 1. PROFILE PAGE
 - Location: `src/app/(dashboard)/profile/page.tsx`
 - Contains: User info, profile picture upload, "Change Password" button
 - Features: Avatar with initials fallback, image compression (WebP), Supabase storage upload
 - Password change: Opens `ChangePasswordModal` — inline form removed
+- Blob URL lifecycle: Properly revokes previous preview URL on file re-upload (memory leak fix)
 - Alerts: Error (red) and success (green) variants
 
 ## 2. MODAL COMPONENTS
 
 ### Base Modal (`src/components/ui/Modal.tsx`)
 - Controlled: `open: boolean`, `onClose: () => void`
-- Escape key to close, click backdrop to close
+- Escape key to close (stable via `useRef` pattern — doesn't re-register listener on every render), click backdrop to close
 - Focus trap (Tab cycling), ARIA attributes
+- Auto-focus guarded: won't steal focus if user is already focused inside the modal
+- Close button has explicit `type="button"` and `tabIndex={0}`
 - Sizes: `sm | md | lg | xl`
 
 ### ChangePasswordModal (`src/components/shared/ChangePasswordModal.tsx`)
@@ -21,6 +24,7 @@
 - Validation: min 6 chars, must differ from current, must match confirm
 - On cancel/dismiss: just closes (user can change later from profile)
 - On success: clears `must_change_password` flag, shows success state, auto-closes after 1.5s
+- Timer cleanup: `setTimeout` handle stored in `useRef` with `useEffect` teardown — prevents execution after unmount
 - Optional `onSuccess` callback for post-change feedback
 
 ### InquiryModal (`src/components/shared/InquiryModal.tsx`)
@@ -84,10 +88,10 @@ No dedicated `/change-password` page exists — requests to that URL redirect to
 ## 7. UI COMPONENTS (src/components/)
 
 ### Primitives (`ui/`)
-Button, Input, Card, Alert, Badge, Modal, Select, Spinner
+Button, Input, Card, Alert, Badge, Modal, Select, Skeleton, Spinner
 
 ### Layout (`layout/`)
-Header, Footer, MobileDrawer, AdminSidebar, OwnerSidebar
+Header, Footer, MobileDrawer, AdminSidebar, OwnerSidebar, TelecallerSidebar
 
 ### Shared (`shared/`)
 IcteLogo, InquiryModal, InstituteInquiryModal, StatusBadge, **ChangePasswordModal** (new)

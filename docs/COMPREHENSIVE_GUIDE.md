@@ -776,7 +776,7 @@ RootLayout
 │   └── ChangePasswordPage
 │
 ├── DashboardLayout (role-based)
-│   ├── AdminSidebar / OwnerSidebar
+│   ├── AdminSidebar / OwnerSidebar / TelecallerSidebar
 │   │   ├── Nav items (icons + labels)
 │   │   ├── User profile card
 │   │   └── Logout button
@@ -825,9 +825,11 @@ RootLayout
 | **StatsCounter** | Home | Animated statistics |
 | **InquiryModal** | Home, Colleges | Student inquiry form |
 | **InstituteInquiryModal** | Home | Direct enrollment form |
+| **ChangePasswordModal** | Dashboard layouts, Profile | Password change with validation and success timer |
 | **IcteLogo** | Header, Sidebar | Brand logo display |
 | **AdminSidebar** | Admin, Owner | Navigation sidebar |
 | **OwnerSidebar** | Owner | Extended admin sidebar |
+| **TelecallerSidebar** | Telecaller | Navigation sidebar for telecaller dashboard |
 
 ---
 
@@ -1073,7 +1075,7 @@ Layer 4: Service Role Key
 ### Storage Security
 
 - **college_logos**: Public bucket (anyone can view)
-- **profile_pictures**: Private bucket (authenticated users only)
+- **profile_pictures**: Public bucket (visible to all, upload requires auth)
 - File size limit: 2MB per upload
 - Client-side image compression before upload
 
@@ -1117,7 +1119,7 @@ Login rate limiting is handled by Supabase Auth's built-in brute-force protectio
 ### Supabase Configuration Checklist
 
 - [ ] Project created in Supabase dashboard
-- [ ] All 17 migrations run in order (001 → 016)
+- [ ] All 21 migrations run in order (001 → 020, with two `015_` files)
 - [ ] Auth settings: Email provider enabled, Confirm email disabled
 - [ ] Storage buckets created (college_logos, profile_pictures)
 - [ ] API settings: JWT expiry configured, allowed redirect URLs set
@@ -1141,7 +1143,7 @@ Login rate limiting is handled by Supabase Auth's built-in brute-force protectio
 ### Performance Considerations
 
 - **Static pages:** Legal pages (`/privacy`, `/terms`, `/disclaimer`) — pre-rendered at build time
-- **Dynamic pages:** All admin/owner/telecaller pages — rendered per request (auth required)
+- **Dynamic pages:** Home page (`/`), all admin/owner/telecaller pages — rendered per request (auth / `cookies()` required)
 - **ISR:** Not used (all dynamic pages require auth)
 - **Edge functions:** Middleware runs at edge (fast auth checks)
 - **Images:** Supabase CDN for storage, Next.js Image Optimization for resizing
