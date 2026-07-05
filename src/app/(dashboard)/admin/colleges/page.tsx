@@ -89,6 +89,7 @@ export default function AdminCollegesPage() {
     const file = e.target.files?.[0] || null;
     setLogoFile(file);
     if (file) {
+      if (logoPreview?.startsWith('blob:')) URL.revokeObjectURL(logoPreview);
       setLogoPreview(URL.createObjectURL(file));
     } else {
       setLogoPreview(null);

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
@@ -22,6 +22,14 @@ export function ChangePasswordModal({ open, onClose, onSuccess }: ChangePassword
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const reset = () => {
     setCurrentPassword('');
@@ -86,7 +94,8 @@ export function ChangePasswordModal({ open, onClose, onSuccess }: ChangePassword
     setSuccess(true);
     setLoading(false);
 
-    setTimeout(() => {
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
       handleClose();
       onSuccess?.();
     }, 1500);

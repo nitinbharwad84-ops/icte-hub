@@ -148,7 +148,10 @@ export default function ProfilePage() {
               <input type="file" accept="image/*" className="hidden" onChange={(e) => {
                 const file = e.target.files?.[0] || null;
                 setProfilePicFile(file);
-                if (file) setProfilePicPreview(URL.createObjectURL(file));
+                if (file) {
+                  if (profilePicPreview?.startsWith('blob:')) URL.revokeObjectURL(profilePicPreview);
+                  setProfilePicPreview(URL.createObjectURL(file));
+                }
               }} />
             </label>
           </div>
