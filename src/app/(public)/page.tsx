@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { HomeContent } from './home-content';
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   let colleges: Array<{ id: string; name: string; mode: string; location: string; courses_offered: string[]; logo_url?: string }> = [];
   let courses: Array<{ id: string; name: string; duration: string; fees: number }> = [];
