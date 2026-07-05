@@ -166,8 +166,7 @@ Critical operations run inside PostgreSQL to ensure **atomicity** and **consiste
 ├── /terms                                     # Terms of service (public)
 ├── /disclaimer                                # Disclaimer (public)
 │
-├── /login                                     # Login page (auth)
-├── /change-password                           # Force password change (auth)
+├── /login                                     # Login page (auth — has "Back to Home" link)
 │
 ├── /admin                                     # Admin dashboard
 │   ├── /admin/institute-leads                 # Institute leads management
@@ -200,8 +199,7 @@ src/app/
 │   └── [legal_route]/
 │
 ├── (auth)/            # Layout: minimal (no header/footer)
-│   ├── login/
-│   └── change-password/
+│   └── login/
 │
 ├── (dashboard)/       # Layout: sidebar + content
 │   ├── admin/
@@ -224,7 +222,7 @@ Request → Middleware
     │   ├── Not logged in → Show login page
     │   └── Logged in → Redirect to role dashboard (/admin, /owner, /telecaller)
     ├── Not logged in? → Redirect to /login
-    ├── Forced password change? → Redirect to /change-password
+    ├── Forced password change? → Redirect to /{role}?change_password=true (modal on dashboard)
     ├── Role mismatch?
     │   ├── /owner but not owner → Redirect to /admin
     │   ├── /admin but not admin/owner → Redirect to /telecaller
@@ -593,7 +591,7 @@ Server Action: supabase.auth.signInWithPassword()
     │         Next request hits middleware
     │                ↓
     │         Middleware checks:
-    │         ├── must_change_password? → Redirect to /change-password
+    │         ├── must_change_password? → Redirect to /{role}?change_password=true
     │         └── Role-based redirect:
     │             ├── owner → /owner
     │             ├── admin → /admin
@@ -607,17 +605,21 @@ Server Action: supabase.auth.signInWithPassword()
 ```
 First login detected (must_change_password = true)
     ↓
-Middleware redirects to /change-password
+Login redirects to /{role}?change_password=true
     ↓
-User enters: current password + new password + confirm
+Dashboard layout reads query param → opens ChangePasswordModal popup
     ↓
-Server Action:
-    1. Verify current password via signInWithPassword()
-    2. Call supabase.auth.updateUser({ password: newPassword })
-    3. Call admin API to set must_change_password = false
-    4. Return success
+User can:
+  Option A: Fill in current + new password and submit
     ↓
-Middleware allows access to dashboard
+    Client Action (ChangePasswordModal):
+        1. Verify current password via signInWithPassword()
+        2. Call supabase.auth.updateUser({ password: newPassword })
+        3. Update public.users: must_change_password = false
+        4. Modal closes, user stays on dashboard
+  Option B: Dismiss the modal
+    ↓
+    User navigates freely; can change password later via Profile → "Change Password"
 ```
 
 ### Session Handling

@@ -25,41 +25,46 @@ export function Modal({ open, onClose, children, className, size = 'md' }: Modal
     if (e.key === 'Escape') onClose();
   }, [onClose]);
 
+  // Escape key — re-runs only when handleEscape identity changes (safe, no focus side-effect)
   useEffect(() => {
-    if (open) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.classList.add('modal-open');
-      // Focus trap
-      const focusable = containerRef.current?.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusable && focusable.length > 0) {
-        focusable[0]?.focus();
-        const handleTab = (e: KeyboardEvent) => {
-          if (e.key !== 'Tab') return;
-          const first = focusable[0];
-          const last = focusable[focusable.length - 1];
-          if (e.shiftKey && document.activeElement === first) {
-            e.preventDefault();
-            last?.focus();
-          } else if (!e.shiftKey && document.activeElement === last) {
-            e.preventDefault();
-            first?.focus();
-          }
-        };
-        document.addEventListener('keydown', handleTab);
-        return () => {
-          document.removeEventListener('keydown', handleTab);
-          document.removeEventListener('keydown', handleEscape);
-          document.body.classList.remove('modal-open');
-        };
-      }
-    }
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.classList.remove('modal-open');
-    };
+    if (!open) return;
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [open, handleEscape]);
+
+  // Initial focus + tab trap — runs ONLY when open changes, never on form state changes
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add('modal-open');
+    const focusable = containerRef.current?.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable && focusable.length > 0) {
+      // Prefer first real input over the close button
+      const firstInput = Array.from(focusable).find(
+        el => ['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName)
+      );
+      (firstInput || focusable[0])?.focus();
+      const handleTab = (e: KeyboardEvent) => {
+        if (e.key !== 'Tab') return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      };
+      document.addEventListener('keydown', handleTab);
+      return () => {
+        document.removeEventListener('keydown', handleTab);
+        document.body.classList.remove('modal-open');
+      };
+    }
+    return () => { document.body.classList.remove('modal-open'); };
+  }, [open]); // intentionally excludes handleEscape — focus must not re-run on every render
 
   if (!open) return null;
 

@@ -51,5 +51,9 @@ BEGIN
   ON CONFLICT (id) DO NOTHING;
   */
 
+  -- The trigger sets must_change_password = true by default.
+  -- Override it for the owner so they land directly on the dashboard.
+  UPDATE public.users SET must_change_password = false WHERE id = v_user_id;
+
   RAISE NOTICE 'Owner user created successfully: % (ID: %)', v_email, v_user_id;
 END $$;

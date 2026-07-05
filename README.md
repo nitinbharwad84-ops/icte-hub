@@ -83,8 +83,8 @@
 ### ⚡ Cross-Cutting
 
 - **Authentication** — Email/password, role-based routing (admin/owner/telecaller)
-- **Force Password Change** — First-login password enforcement
-- **Profile** — Edit name, change password, upload profile picture with WebP compression
+- **Password Change** — First-login enforcement via dashboard popup modal (dismissible); available anytime from profile
+- **Profile** — Edit name, change password via modal, upload profile picture with WebP compression
 - **Image Compression** — Client-side WebP conversion for logos (400px, 90%) and avatars (200px, 65%)
 - **CSV Export** — Shared utility for downloading leads, inquiries, and reports
 - **Behavioral Tracking** — Anonymous visitor tracking, engagement scoring
@@ -158,7 +158,7 @@ npm install
 # Create environment file from example (edit with your values)
 cp .env.example .env.local
 
-# Run Supabase migrations in order (001 → 016) via SQL Editor
+# Run Supabase migrations in order (001 → 018) via SQL Editor — see docs/SETUP_GUIDE.md
 
 # Start the development server
 npm run dev
@@ -209,7 +209,7 @@ npm run lint     # Run ESLint
 | `/colleges` | ✅ | ✅ | ✅ | ✅ |
 | `/check-status` | ✅ | ✅ | ✅ | ✅ |
 | `/partner-with-us` | ✅ | ✅ | ✅ | ✅ |
-| `/login` | ✅ | ✅ | ✅ | ✅ |
+| `/login` | ✅ | ✅ | ✅ | ✅ (Back to Home link) |
 | `/admin/*` | ✅ | ✅ | ❌ | ❌ |
 | `/owner/*` | ✅ | ❌ | ❌ | ❌ |
 | `/telecaller` | ❌ | ❌ | ✅ | ❌ |
@@ -243,7 +243,7 @@ The UI follows a consistent design system defined in [docs/icte-hub-design-syste
 
 ## Database Migrations
 
-Run in order (001 → 016) via Supabase SQL Editor. There are 17 `.sql` files total (two files share the `015_` prefix).
+Run in order (001 → 018) via Supabase SQL Editor. There are **19 SQL files** total (two files share the `015_` prefix — run both).
 
 | File | Description |
 |------|-------------|
@@ -264,6 +264,10 @@ Run in order (001 → 016) via Supabase SQL Editor. There are 17 `.sql` files to
 | `015_colleges_extended.sql` | Extended college fields |
 | `015_page_visits_lead_sessions.sql` | Page visit & session tracking |
 | `016_partner_inquiries_extend.sql` | Extended partner inquiry fields |
+| `017_comprehensive_fixes.sql` | FK constraints, indexes, RLS tightening, updated_at |
+| `018_schema_fixes.sql` | ⭐ Missing columns, public RPC, storage policy fixes |
+
+> See [docs/SETUP_GUIDE.md](./docs/SETUP_GUIDE.md) for the full step-by-step numbered guide.
 
 ## Seed Data
 

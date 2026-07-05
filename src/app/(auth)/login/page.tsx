@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { IcteLogo } from '@/components/shared/IcteLogo';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -62,10 +63,11 @@ function LoginForm() {
         .eq('id', user.id)
         .single();
 
+      const dashPath = `/${profile?.role || 'telecaller'}`;
       if (profile?.must_change_password) {
-        router.push('/change-password');
+        router.push(`${dashPath}?change_password=true`);
       } else {
-        router.push(`/${profile?.role || 'telecaller'}`);
+        router.push(dashPath);
       }
     }
 
@@ -116,6 +118,13 @@ function LoginForm() {
               Sign In
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-900 transition-colors">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -44,8 +44,9 @@ export async function middleware(request: NextRequest) {
         profile = null;
       }
 
-      if (profile?.must_change_password) return NextResponse.redirect(new URL('/change-password', request.url));
-      return NextResponse.redirect(new URL(`/${profile?.role || 'telecaller'}`, request.url));
+      const dashPath = `/${profile?.role || 'telecaller'}`;
+      if (profile?.must_change_password) return NextResponse.redirect(new URL(`${dashPath}?change_password=true`, request.url));
+      return NextResponse.redirect(new URL(dashPath, request.url));
     }
 
     if (!user) return NextResponse.redirect(new URL('/login', request.url));
@@ -70,10 +71,9 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
-    if (profile.must_change_password && path !== '/change-password') {
-      return NextResponse.redirect(new URL('/change-password', request.url));
+    if (path === '/change-password') {
+      return NextResponse.redirect(new URL(`/${profile.role || 'telecaller'}`, request.url));
     }
-    if (path === '/change-password') return supabaseResponse;
 
     const role = profile.role;
     if (path.startsWith('/owner') && role !== 'owner') return NextResponse.redirect(new URL(`/${role}`, request.url));

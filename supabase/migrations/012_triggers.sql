@@ -49,9 +49,9 @@ BEGIN
     v_description := 'Created ' || v_target_entity || ' record';
   ELSIF TG_OP = 'UPDATE' THEN
     v_old := to_jsonb(OLD); v_new := to_jsonb(NEW);
-    IF (v_target_entity IN ('leads', 'institute_leads') AND OLD.status IS DISTINCT FROM NEW.status) THEN
+    IF (v_target_entity IN ('leads', 'institute_leads') AND (v_old->>'status') IS DISTINCT FROM (v_new->>'status')) THEN
       v_action := 'status_change';
-      v_description := 'Changed ' || v_target_entity || ' status from ''' || OLD.status || ''' to ''' || NEW.status || '''';
+      v_description := 'Changed ' || v_target_entity || ' status from ''' || (v_old->>'status') || ''' to ''' || (v_new->>'status') || '''';
     ELSE
       v_action := 'update';
       v_description := 'Updated ' || v_target_entity || ' record';

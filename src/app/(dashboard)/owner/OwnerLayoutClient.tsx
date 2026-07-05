@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { OwnerSidebar } from '@/components/layout/OwnerSidebar';
-import { Menu, X } from 'lucide-react';
+import { ChangePasswordModal } from '@/components/shared/ChangePasswordModal';
+import { Menu } from 'lucide-react';
 
 interface OwnerLayoutClientProps {
   user: { name: string; email: string; role: string };
@@ -10,6 +12,15 @@ interface OwnerLayoutClientProps {
 
 export function OwnerLayoutClient({ user, children }: OwnerLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('change_password') === 'true') {
+      setShowPasswordModal(true);
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -36,6 +47,11 @@ export function OwnerLayoutClient({ user, children }: OwnerLayoutClientProps) {
       <main className="md:ml-60 min-h-screen">
         {children}
       </main>
+
+      <ChangePasswordModal
+        open={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+      />
     </div>
   );
 }

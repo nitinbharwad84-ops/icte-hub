@@ -7,14 +7,15 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Alert } from '@/components/ui/Alert';
 import { Spinner } from '@/components/ui/Spinner';
-import { User, Mail, Phone, Lock, KeyRound, Save, Upload } from 'lucide-react';
+import { User, Mail, Phone, Lock, Save, Upload } from 'lucide-react';
 import { compressProfile } from '@/lib/utils/image-compression';
+import { ChangePasswordModal } from '@/components/shared/ChangePasswordModal';
 
 export default function ProfilePage() {
   const supabase = createClient();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [changingPassword, setChangingPassword] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -27,9 +28,6 @@ export default function ProfilePage() {
   const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
   const [profilePicPreview, setProfilePicPreview] = useState<string | null>(null);
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   useEffect(() => {
     async function loadProfile() {
@@ -54,8 +52,9 @@ export default function ProfilePage() {
           setProfilePicPreview(profile.profile_picture_url || null);
         }
         setLoading(false);
-      } catch (err) {
-        console.error('Failed to load profile:', err);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : (err as { message?: string })?.message || JSON.stringify(err);
+        console.error('Failed to load profile:', msg);
         setError('Failed to load profile');
         setLoading(false);
       }
@@ -112,59 +111,6 @@ export default function ProfilePage() {
     setSaving(false);
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (newPassword !== confirmPassword) {
-      setError('New passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-    if (currentPassword === newPassword) {
-      setError('New password must differ from current password');
-      return;
-    }
-
-    setChangingPassword(true);
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.email) {
-      setError('Session expired. Please login again.');
-      setChangingPassword(false);
-      return;
-    }
-
-    const { error: verifyError } = await supabase.auth.signInWithPassword({
-      email: user.email,
-      password: currentPassword,
-    });
-
-    if (verifyError) {
-      setError('Current password is incorrect');
-      setChangingPassword(false);
-      return;
-    }
-
-    const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
-    if (updateError) {
-      setError(updateError.message);
-      setChangingPassword(false);
-      return;
-    }
-
-    await supabase.from('users').update({ must_change_password: false }).eq('id', user.id);
-
-    setSuccess('Password changed successfully');
-    setCurrentPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
-    setChangingPassword(false);
-  };
 
   if (loading) {
     return (
@@ -252,45 +198,25 @@ export default function ProfilePage() {
 
       {/* Change Password Card */}
       <Card glass className="!p-6 !rounded-2xl">
-        <div className="flex items-center gap-3 mb-6">
-          <Lock className="w-5 h-5 text-slate-400" />
-          <h2 className="text-lg font-extrabold text-slate-900">Change Password</h2>
-        </div>
-        <form onSubmit={handleChangePassword} className="space-y-4">
-          <Input
-            label="Current Password"
-            type="password"
-            placeholder="Enter current password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            icon={<Lock className="w-4 h-4" />}
-            required
-          />
-          <Input
-            label="New Password"
-            type="password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            icon={<KeyRound className="w-4 h-4" />}
-            required
-          />
-          <Input
-            label="Confirm New Password"
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            icon={<KeyRound className="w-4 h-4" />}
-            required
-          />
-          <div className="flex justify-end">
-            <Button type="submit" loading={changingPassword}>
-              <Lock className="w-4 h-4" /> Update Password
-            </Button>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Lock className="w-5 h-5 text-slate-400" />
+            <div>
+              <h2 className="text-lg font-extrabold text-slate-900">Change Password</h2>
+              <p className="text-sm text-slate-500">Update your password to keep your account secure</p>
+            </div>
           </div>
-        </form>
+          <Button variant="secondary" onClick={() => setShowPasswordModal(true)}>
+            <Lock className="w-4 h-4" /> Change Password
+          </Button>
+        </div>
       </Card>
+
+      <ChangePasswordModal
+        open={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onSuccess={() => setSuccess('Password changed successfully')}
+      />
     </div>
   );
 }

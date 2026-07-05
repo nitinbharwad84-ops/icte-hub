@@ -47,7 +47,7 @@ export async function createLeadAction(data: LeadInput) {
     interested_college_ids: parsed.data.college_ids?.length ? parsed.data.college_ids : [],
     enrolled_institute_course_id: parsed.data.enrolled_institute_course_id || null,
     message: parsed.data.message || null,
-    source: 'direct',
+    source: 'website',
   });
 
   if (error) return { error: error.message, success: false };
@@ -67,12 +67,12 @@ export async function checkLeadStatus(_prevState: { success: boolean }, formData
     if (!parsed.success) return { success: false, error: parsed.error.errors[0].message };
 
     const supabase = await createClient();
-    const { data } = await supabase
-      .from('leads')
-      .select('name, status, interested_college_ids, created_at')
-      .ilike('name', parsed.data.name)
-      .eq('phone', parsed.data.phone);
+    const { data, error } = await supabase.rpc('check_lead_status', {
+      p_name: parsed.data.name,
+      p_phone: parsed.data.phone,
+    });
 
+    if (error) return { success: false, error: error.message };
     if (!data || data.length === 0) return { success: true, leads: [] };
     return { success: true, leads: data };
   } catch (e) {
