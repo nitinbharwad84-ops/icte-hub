@@ -103,7 +103,7 @@ export default function InstituteCoursesPage() {
     setEditingCourse(course);
     setForm({
       course_name: course.course_name,
-      institute_id: course.institute_id,
+      institute_id: course.institute_id || '',
       duration: course.duration,
       fee: course.fee?.toString() || '',
       mode: course.mode,
