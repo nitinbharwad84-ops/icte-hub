@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1] - 2026-07-06
+
+### Fixed
+- **Modal focus-stealing** (`src/components/ui/Modal.tsx`): Escape key handler now uses `useRef` to break React effect dependency chain — typing in form fields no longer causes focus to jump out of the input on every keystroke
+- **Select null value warning** (`src/components/ui/Select.tsx`): Added `value={props.value ?? ''}` safeguard to suppress React "`value` prop on `select` should not be null" console error when bound to nullable database fields
+- **Blob URL memory leaks** (`profile/page.tsx`, `colleges/page.tsx`): Added `URL.revokeObjectURL()` cleanup before creating new preview URLs on file re-upload
+- **ChangePasswordModal timer leak** (`ChangePasswordModal.tsx`): Stored `setTimeout` handle in a `useRef` with `useEffect` cleanup to prevent stale timer execution after unmount
+- **Vercel build warning** (`(public)/page.tsx`): Added `export const dynamic = 'force-dynamic'` to suppress `cookies()` static-generation warning on the home page
+
+---
+
 ## [1.1.0] - 2026-07-05
 
 ### Changed

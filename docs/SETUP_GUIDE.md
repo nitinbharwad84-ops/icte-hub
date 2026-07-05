@@ -272,7 +272,7 @@ Go to **Settings → Domains** → add your domain → follow Vercel's DNS instr
 ### 9.2 Database Issues
 
 **Problem:** "relation 'public.users' does not exist"
-**Fix:** Migrations not run. Run all 19 SQL files from `supabase/migrations/` in order.
+**Fix:** Migrations not run. Run all 21 SQL files from `supabase/migrations/` in order.
 
 **Problem:** "new row violates row-level security policy"
 **Fix:** Re-run `011_rls_policies.sql` and `018_schema_fixes.sql`.

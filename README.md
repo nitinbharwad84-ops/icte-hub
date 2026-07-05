@@ -130,7 +130,7 @@ src/
 │   └── utils/             # cn, constants, csv, formatters, session, image-compression
 ├── middleware.ts           # Auth: role routing + forced password change
 └── styles/globals.css     # Tailwind + custom animations
-supabase/migrations/       # 17 SQL migration files (001 → 016, with two `015_` files)
+supabase/migrations/       # 21 SQL migration files (001 → 020, with two `015_` files)
 supabase/seed/             # 10 SQL seed files (owner creation + dummy data + cleanup)
 docs/                      # Design docs, comprehensive guide, setup guide
 ```
@@ -158,7 +158,7 @@ npm install
 # Create environment file from example (edit with your values)
 cp .env.example .env.local
 
-# Run Supabase migrations in order (001 → 018) via SQL Editor — see docs/SETUP_GUIDE.md
+# Run Supabase migrations in order (001 → 020) via SQL Editor — see docs/SETUP_GUIDE.md
 
 # Start the development server
 npm run dev
@@ -243,7 +243,7 @@ The UI follows a consistent design system defined in [docs/icte-hub-design-syste
 
 ## Database Migrations
 
-Run in order (001 → 018) via Supabase SQL Editor. There are **19 SQL files** total (two files share the `015_` prefix — run both).
+Run in order (001 → 020) via Supabase SQL Editor. There are **21 SQL files** total (two files share the `015_` prefix — run both).
 
 | File | Description |
 |------|-------------|
@@ -266,6 +266,8 @@ Run in order (001 → 018) via Supabase SQL Editor. There are **19 SQL files** t
 | `016_partner_inquiries_extend.sql` | Extended partner inquiry fields |
 | `017_comprehensive_fixes.sql` | FK constraints, indexes, RLS tightening, updated_at |
 | `018_schema_fixes.sql` | ⭐ Missing columns, public RPC, storage policy fixes |
+| `019_grants.sql` | ⭐ Table-level GRANT for authenticated + anon roles (required for login) |
+| `020_schema_fixes_2.sql` | Renames institute_courses columns, adds users.phone |
 
 > See [docs/SETUP_GUIDE.md](./docs/SETUP_GUIDE.md) for the full step-by-step numbered guide.
 
